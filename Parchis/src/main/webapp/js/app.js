@@ -286,9 +286,23 @@ function obtenerNombreJugador(color) {
     return jugador ? jugador.nombre : color;
 }
 function mostrarDado(valor) {
+    console.log('[DADO] 🎲 Mostrando valor:', valor);
+    
+    // ✅ Detener cualquier animación en curso
+    if (window.animacionDadoActual) {
+        clearInterval(window.animacionDadoActual);
+        window.animacionDadoActual = null;
+    }
+    
+    // ✅ Actualizar texto
     valorDado.textContent = `Resultado: ${valor}`;
-    dado.innerHTML = `<img src="assets/D${valor}.jpg" alt="Dado ${valor}" style="width: 100%; height: 100%; border-radius: 15px;" onerror="this.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:4rem;font-weight:bold;color:#1a1a2e;\\'>${valor}</div>'">`;
+    
+    // ✅ Actualizar imagen del dado
+    dado.innerHTML = `<img src="assets/D${valor}.jpg" alt="Dado ${valor}" 
+                      style="width: 100%; height: 100%; border-radius: 15px;" 
+                      onerror="this.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:4rem;font-weight:bold;color:#1a1a2e;\\'>${valor}</div>'">`;
 }
+
 
 // ============================================
 // WEBSOCKET - MEJORADO
@@ -351,6 +365,15 @@ function enviarMensaje(datos) {
 // ============================================
 function manejarMensaje(mensaje) {
     console.log('[WS] 📨 Procesando:', mensaje.tipo);
+    
+    // ✅ CRÍTICO: Log especial para DADO_TIRADO
+    if (mensaje.tipo === 'DADO_TIRADO') {
+        console.log('[WS] ===== DADO TIRADO =====');
+        console.log('[WS] Valor del servidor:', mensaje.valor);
+        console.log('[WS] Color del jugador:', mensaje.color);
+        console.log('[WS] Contador de 6:', mensaje.contadorSeis);
+        console.log('[WS] =======================');
+    }
     
     switch (mensaje.tipo) {
         case 'CONEXION_EXITOSA':
@@ -416,7 +439,6 @@ function manejarMensaje(mensaje) {
         case 'ERROR':
             mostrarMensajeError(mensaje.mensaje);
             agregarLog(mensaje.mensaje, 'error');
-            // Rehabilitar el dado en caso de error
             if (estadoJuego.turnoActual === miColor) {
                 setTimeout(() => habilitarDado(), 1000);
             }
@@ -938,16 +960,24 @@ function tirarDado() {
     puedeTirarDado = false;
     btnTirarDado.disabled = true;
     
-    // Animación del dado
+    // ✅ Animación del dado mientras espera respuesta
+    let intervaloAnimacion = null;
     let contador = 0;
-    const intervalo = setInterval(() => {
+    
+    intervaloAnimacion = setInterval(() => {
         const valorAleatorio = Math.floor(Math.random() * 6) + 1;
-        mostrarDado(valorAleatorio);
+        dado.innerHTML = `<img src="assets/D${valorAleatorio}.jpg" alt="Dado ${valorAleatorio}" style="width: 100%; height: 100%; border-radius: 15px;">`;
         contador++;
-        if (contador > 10) {
-            clearInterval(intervalo);
+        
+        // Detener animación después de 1 segundo si no hay respuesta
+        if (contador > 12) {
+            clearInterval(intervaloAnimacion);
+            valorDado.textContent = 'Esperando...';
         }
     }, 80);
+    
+    // Guardar referencia para detenerla cuando llegue la respuesta
+    window.animacionDadoActual = intervaloAnimacion;
     
     // ENVIAR MENSAJE AL SERVIDOR
     const mensaje = { 
@@ -958,24 +988,23 @@ function tirarDado() {
     enviarMensaje(mensaje);
 }
 // ============================================
-// PROCESAR DADO - MEJORADO
+// PROCESAR DADO 
 // ============================================
 function procesarDado(mensaje) {
     console.log('[DADO] === PROCESANDO RESULTADO ===');
     console.log('[DADO] Mensaje completo:', mensaje);
     
-    const valor = mensaje.valor;
+    const valor = mensaje.valor;  // ✅ Usar el valor que envía el servidor
     estadoJuego.ultimoDado = valor;
     estadoJuego.contadorSeis = mensaje.contadorSeis || 0;
     
-    console.log('[DADO] Resultado:', valor, 'Contador 6:', estadoJuego.contadorSeis);
+    console.log('[DADO] *** VALOR REAL DEL SERVIDOR:', valor, '***');
+    console.log('[DADO] Contador 6:', estadoJuego.contadorSeis);
     
-    // Mostrar resultado del dado
-    setTimeout(() => {
-        mostrarDado(valor);
-    }, 500);
+    // ✅ CRÍTICO: Detener animación y mostrar el valor real del servidor
+    mostrarDado(valor);
     
-    const colorJugador = mensaje.color; // USAR SOLO COLOR, NO NOMBRE
+    const colorJugador = mensaje.color;
     const nombreJugador = obtenerNombreJugador(colorJugador);
     agregarLog(`${nombreJugador} tiró un ${valor}`, 'importante');
     
@@ -983,7 +1012,6 @@ function procesarDado(mensaje) {
     if (mensaje.sinFichasDisponibles) {
         console.log('[DADO] Backend indica: sin fichas disponibles');
         agregarLog('No hay fichas disponibles para mover');
-        // El backend ya cambió el turno, no hacer nada más
         return;
     }
     
@@ -992,7 +1020,7 @@ function procesarDado(mensaje) {
         console.log('[DADO] ✓ Es mi turno, verificando mis fichas...');
         setTimeout(() => {
             verificarFichasDisponibles(valor);
-        }, 800);
+        }, 300);
     } else {
         console.log('[DADO] ✗ No es mi turno, turno de:', colorJugador);
     }
