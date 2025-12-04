@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Servidor WebSocket mejorado para Parchís
- * Compatible con el frontend JavaScript
+ * Servidor WebSocket CORREGIDO para Parchís
+ * Maneja correctamente TIRAR_DADO y otras acciones
  */
 public class ServidorWeb extends WebSocketServer {
     
@@ -52,7 +52,6 @@ public class ServidorWeb extends WebSocketServer {
             sesiones.remove(conn);
         }
         
-        // Notificar a todos los clientes del cambio en el lobby
         broadcast(adaptador.obtenerEstadoLobby());
     }
     
@@ -64,6 +63,9 @@ public class ServidorWeb extends WebSocketServer {
         try {
             JsonObject json = JsonParser.parseString(message).getAsJsonObject();
             String accion = json.get("accion").getAsString();
+            
+            // Log más detallado
+            System.out.println("[SERVIDOR] Procesando acción: '" + accion + "'");
             
             String respuesta = procesarAccion(sessionId, accion, json, conn);
             
@@ -96,63 +98,77 @@ public class ServidorWeb extends WebSocketServer {
     }
     
     /**
-     * Procesa las diferentes acciones del cliente
+     * Procesa las diferentes acciones del cliente - CORREGIDO
      */
     private String procesarAccion(String sessionId, String accion, JsonObject json, WebSocket conn) {
         System.out.println("[SERVIDOR] Procesando acción: " + accion);
         
-        switch (accion) {
+        // Normalizar acción (por si viene en diferentes formatos)
+        String accionNormalizada = accion.toUpperCase().replace("_", "");
+        
+        switch (accionNormalizada) {
             // === ACCIONES DE SALA ===
-            case "CREAR_SALA": {
+            case "CREARSALA": {
                 String nombre = json.has("nombre") ? json.get("nombre").getAsString() : "Jugador";
                 String avatar = json.has("avatar") ? json.get("avatar").getAsString() : "personaje0";
+                System.out.println("[SERVIDOR] Creando sala para: " + nombre);
                 return adaptador.crearSala(sessionId, nombre, avatar);
             }
             
-            case "UNIRSE_SALA": {
+            case "UNIRSESALA": 
+            case "UNIRSEASALA": {
                 String nombre = json.has("nombre") ? json.get("nombre").getAsString() : "Jugador";
                 String avatar = json.has("avatar") ? json.get("avatar").getAsString() : "personaje0";
+                System.out.println("[SERVIDOR] Uniéndose a sala: " + nombre);
                 return adaptador.unirseSala(sessionId, nombre, avatar);
             }
             
-            case "REGISTRAR_JUGADOR": {
+            case "REGISTRARJUGADOR": {
                 String nombre = json.get("nombre").getAsString();
                 String color = json.has("color") ? json.get("color").getAsString() : "";
                 String avatar = json.has("avatar") ? json.get("avatar").getAsString() : "personaje0";
                 return adaptador.registrarJugador(sessionId, nombre, color, avatar);
             }
             
-            case "SALIR_SALA": {
+            case "SALIRSALA": {
                 adaptador.eliminarJugador(sessionId);
-                return null; // El broadcast del lobby se hace en onClose
+                return null;
             }
             
-            case "OBTENER_ESTADO_LOBBY":
+            case "OBTENERESTADOLOBBY":
                 return adaptador.obtenerEstadoLobby();
             
             // === ACCIONES DE PARTIDA ===
-            case "INICIAR_PARTIDA":
-            case "SOLICITAR_INICIO":
+            case "INICIARPARTIDA":
+            case "SOLICITARINICIO":
+                System.out.println("[SERVIDOR] Iniciando partida...");
                 return adaptador.intentarIniciarPartida();
             
-            case "TIRAR_DADO":
-                return adaptador.tirarDado(sessionId);
+            case "TIRARDADO": {
+                System.out.println("[SERVIDOR] *** TIRAR DADO RECIBIDO ***");
+                System.out.println("[SERVIDOR] SessionId: " + sessionId);
+                String resultado = adaptador.tirarDado(sessionId);
+                System.out.println("[SERVIDOR] Resultado tirada: " + resultado);
+                return resultado;
+            }
             
-            case "MOVER_FICHA": {
+            case "MOVERFICHA": {
                 int fichaId = json.get("fichaId").getAsInt();
                 int pasos = json.get("pasos").getAsInt();
+                System.out.println("[SERVIDOR] Moviendo ficha: " + fichaId + " con " + pasos + " pasos");
                 return adaptador.moverFicha(sessionId, fichaId, pasos);
             }
             
-            case "CAMBIAR_TURNO":
-            case "PASAR_TURNO":
+            case "CAMBIARTURNO":
+            case "PASARTURNO":
+                System.out.println("[SERVIDOR] Cambiando turno...");
                 return adaptador.cambiarTurno();
             
-            case "OBTENER_ESTADO_JUEGO":
+            case "OBTENERESTADOJUEGO":
                 return adaptador.obtenerEstadoJuego();
             
             default:
-                System.out.println("[SERVIDOR] Acción desconocida: " + accion);
+                System.out.println("[SERVIDOR] ⚠️ Acción desconocida: " + accion);
                 Map<String, String> error = new HashMap<>();
                 error.put("tipo", "ERROR");
                 error.put("mensaje", "Acción desconocida: " + accion);
@@ -164,38 +180,41 @@ public class ServidorWeb extends WebSocketServer {
      * Maneja cómo se envía la respuesta (individual o broadcast)
      */
     private void manejarRespuesta(WebSocket conn, String accion, String respuesta) {
-        switch (accion) {
-            // Acciones que requieren broadcast a todos
-            case "CREAR_SALA":
-            case "UNIRSE_SALA":
-            case "REGISTRAR_JUGADOR":
+        String accionNormalizada = accion.toUpperCase().replace("_", "");
+        
+        switch (accionNormalizada) {
+            case "CREARSALA":
+            case "UNIRSESALA":
+            case "UNIRSEASALA":
+            case "REGISTRARJUGADOR":
                 conn.send(respuesta);
                 broadcast(adaptador.obtenerEstadoLobby());
                 break;
                 
-            case "INICIAR_PARTIDA":
-            case "SOLICITAR_INICIO":
+            case "INICIARPARTIDA":
+            case "SOLICITARINICIO":
+                System.out.println("[SERVIDOR] Broadcasting inicio de partida");
                 broadcast(respuesta);
                 break;
                 
-            case "TIRAR_DADO":
+            case "TIRARDADO":
+                System.out.println("[SERVIDOR] Broadcasting resultado del dado");
                 broadcast(respuesta);
                 break;
                 
-            case "MOVER_FICHA":
+            case "MOVERFICHA":
+                System.out.println("[SERVIDOR] Broadcasting movimiento de ficha");
                 broadcast(respuesta);
-                // También enviar estado actualizado del juego
                 broadcast(adaptador.obtenerEstadoJuego());
                 break;
                 
-            case "CAMBIAR_TURNO":
-            case "PASAR_TURNO":
+            case "CAMBIARTURNO":
+            case "PASARTURNO":
                 broadcast(respuesta);
                 break;
                 
-            // Acciones que solo responden al cliente que las solicitó
-            case "OBTENER_ESTADO_LOBBY":
-            case "OBTENER_ESTADO_JUEGO":
+            case "OBTENERESTADOLOBBY":
+            case "OBTENERESTADOJUEGO":
                 conn.send(respuesta);
                 break;
                 

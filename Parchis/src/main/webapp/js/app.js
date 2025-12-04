@@ -38,7 +38,7 @@ const COLORES_OSCUROS = {
     AMARILLO: '#d35400'
 };
 
-// Casillas de salida para cada color (donde aparece la ficha al sacar 5)
+// Casillas de salida para cada color
 const CASILLAS_SALIDA = {
     ROJO: 0,
     VERDE: 17,
@@ -65,102 +65,98 @@ const CASILLAS_TABLERO = generarCasillasTablero();
 
 function generarCasillasTablero() {
     const casillas = [];
-    
-    // El tablero es de 800x800, dividido en 15x15 casillas (cada una ~53px)
     const size = 800;
     const cs = size / 15;
-    const c = (i) => cs * i + cs / 2; // Centro de casilla i
-    
-    // === RUTA COMPLETA DEL TABLERO (68 casillas) ===
+    const c = (i) => cs * i + cs / 2;
     
     // Salida ROJO y subiendo (0-7)
-    casillas.push({x: c(6), y: c(13), segura: true});  // 0 - Salida ROJO
-    casillas.push({x: c(6), y: c(12), segura: false}); // 1
-    casillas.push({x: c(6), y: c(11), segura: false}); // 2
-    casillas.push({x: c(6), y: c(10), segura: false}); // 3
-    casillas.push({x: c(6), y: c(9), segura: false});  // 4
-    casillas.push({x: c(5), y: c(8), segura: true});   // 5 - Segura
-    casillas.push({x: c(4), y: c(8), segura: false});  // 6
-    casillas.push({x: c(3), y: c(8), segura: false});  // 7
+    casillas.push({x: c(6), y: c(13), segura: true});
+    casillas.push({x: c(6), y: c(12), segura: false});
+    casillas.push({x: c(6), y: c(11), segura: false});
+    casillas.push({x: c(6), y: c(10), segura: false});
+    casillas.push({x: c(6), y: c(9), segura: false});
+    casillas.push({x: c(5), y: c(8), segura: true});
+    casillas.push({x: c(4), y: c(8), segura: false});
+    casillas.push({x: c(3), y: c(8), segura: false});
     
     // Lado izquierdo (8-16)
-    casillas.push({x: c(2), y: c(8), segura: false});  // 8
-    casillas.push({x: c(1), y: c(8), segura: false});  // 9
-    casillas.push({x: c(0), y: c(8), segura: false});  // 10
-    casillas.push({x: c(0), y: c(7), segura: false});  // 11
-    casillas.push({x: c(0), y: c(6), segura: true});   // 12 - Segura
-    casillas.push({x: c(1), y: c(6), segura: false});  // 13
-    casillas.push({x: c(2), y: c(6), segura: false});  // 14
-    casillas.push({x: c(3), y: c(6), segura: false});  // 15
-    casillas.push({x: c(4), y: c(6), segura: false});  // 16
+    casillas.push({x: c(2), y: c(8), segura: false});
+    casillas.push({x: c(1), y: c(8), segura: false});
+    casillas.push({x: c(0), y: c(8), segura: false});
+    casillas.push({x: c(0), y: c(7), segura: false});
+    casillas.push({x: c(0), y: c(6), segura: true});
+    casillas.push({x: c(1), y: c(6), segura: false});
+    casillas.push({x: c(2), y: c(6), segura: false});
+    casillas.push({x: c(3), y: c(6), segura: false});
+    casillas.push({x: c(4), y: c(6), segura: false});
     
     // Salida VERDE y subiendo (17-25)
-    casillas.push({x: c(5), y: c(6), segura: true});   // 17 - Salida VERDE
-    casillas.push({x: c(6), y: c(5), segura: false});  // 18
-    casillas.push({x: c(6), y: c(4), segura: false});  // 19
-    casillas.push({x: c(6), y: c(3), segura: false});  // 20
-    casillas.push({x: c(6), y: c(2), segura: false});  // 21
-    casillas.push({x: c(6), y: c(1), segura: true});   // 22 - Segura
-    casillas.push({x: c(6), y: c(0), segura: false});  // 23
-    casillas.push({x: c(7), y: c(0), segura: false});  // 24
-    casillas.push({x: c(8), y: c(0), segura: false});  // 25
+    casillas.push({x: c(5), y: c(6), segura: true});
+    casillas.push({x: c(6), y: c(5), segura: false});
+    casillas.push({x: c(6), y: c(4), segura: false});
+    casillas.push({x: c(6), y: c(3), segura: false});
+    casillas.push({x: c(6), y: c(2), segura: false});
+    casillas.push({x: c(6), y: c(1), segura: true});
+    casillas.push({x: c(6), y: c(0), segura: false});
+    casillas.push({x: c(7), y: c(0), segura: false});
+    casillas.push({x: c(8), y: c(0), segura: false});
     
     // Lado superior derecho (26-33)
-    casillas.push({x: c(8), y: c(1), segura: false});  // 26
-    casillas.push({x: c(8), y: c(2), segura: false});  // 27
-    casillas.push({x: c(8), y: c(3), segura: false});  // 28
-    casillas.push({x: c(8), y: c(4), segura: true});   // 29 - Segura
-    casillas.push({x: c(8), y: c(5), segura: false});  // 30
-    casillas.push({x: c(9), y: c(6), segura: false});  // 31
-    casillas.push({x: c(10), y: c(6), segura: false}); // 32
-    casillas.push({x: c(11), y: c(6), segura: false}); // 33
+    casillas.push({x: c(8), y: c(1), segura: false});
+    casillas.push({x: c(8), y: c(2), segura: false});
+    casillas.push({x: c(8), y: c(3), segura: false});
+    casillas.push({x: c(8), y: c(4), segura: true});
+    casillas.push({x: c(8), y: c(5), segura: false});
+    casillas.push({x: c(9), y: c(6), segura: false});
+    casillas.push({x: c(10), y: c(6), segura: false});
+    casillas.push({x: c(11), y: c(6), segura: false});
     
     // Salida AZUL y bajando (34-42)
-    casillas.push({x: c(12), y: c(6), segura: true});  // 34 - Salida AZUL
-    casillas.push({x: c(13), y: c(6), segura: false}); // 35
-    casillas.push({x: c(14), y: c(6), segura: false}); // 36
-    casillas.push({x: c(14), y: c(7), segura: false}); // 37
-    casillas.push({x: c(14), y: c(8), segura: false}); // 38
-    casillas.push({x: c(13), y: c(8), segura: true});  // 39 - Segura
-    casillas.push({x: c(12), y: c(8), segura: false}); // 40
-    casillas.push({x: c(11), y: c(8), segura: false}); // 41
-    casillas.push({x: c(10), y: c(8), segura: false}); // 42
+    casillas.push({x: c(12), y: c(6), segura: true});
+    casillas.push({x: c(13), y: c(6), segura: false});
+    casillas.push({x: c(14), y: c(6), segura: false});
+    casillas.push({x: c(14), y: c(7), segura: false});
+    casillas.push({x: c(14), y: c(8), segura: false});
+    casillas.push({x: c(13), y: c(8), segura: true});
+    casillas.push({x: c(12), y: c(8), segura: false});
+    casillas.push({x: c(11), y: c(8), segura: false});
+    casillas.push({x: c(10), y: c(8), segura: false});
     
     // Lado derecho bajando (43-50)
-    casillas.push({x: c(9), y: c(8), segura: false});  // 43
-    casillas.push({x: c(8), y: c(9), segura: false});  // 44
-    casillas.push({x: c(8), y: c(10), segura: false}); // 45
-    casillas.push({x: c(8), y: c(11), segura: true});  // 46 - Segura
-    casillas.push({x: c(8), y: c(12), segura: false}); // 47
-    casillas.push({x: c(8), y: c(13), segura: false}); // 48
-    casillas.push({x: c(8), y: c(14), segura: false}); // 49
-    casillas.push({x: c(7), y: c(14), segura: false}); // 50
+    casillas.push({x: c(9), y: c(8), segura: false});
+    casillas.push({x: c(8), y: c(9), segura: false});
+    casillas.push({x: c(8), y: c(10), segura: false});
+    casillas.push({x: c(8), y: c(11), segura: true});
+    casillas.push({x: c(8), y: c(12), segura: false});
+    casillas.push({x: c(8), y: c(13), segura: false});
+    casillas.push({x: c(8), y: c(14), segura: false});
+    casillas.push({x: c(7), y: c(14), segura: false});
     
     // Salida AMARILLO y continuando (51-59)
-    casillas.push({x: c(6), y: c(14), segura: true});  // 51 - Salida AMARILLO
-    casillas.push({x: c(6), y: c(13), segura: false}); // 52
-    casillas.push({x: c(6), y: c(12), segura: false}); // 53
-    casillas.push({x: c(6), y: c(11), segura: false}); // 54
-    casillas.push({x: c(6), y: c(10), segura: false}); // 55
-    casillas.push({x: c(5), y: c(8), segura: true});   // 56 - Segura (repite zona)
-    casillas.push({x: c(4), y: c(8), segura: false});  // 57
-    casillas.push({x: c(3), y: c(8), segura: false});  // 58
-    casillas.push({x: c(2), y: c(8), segura: false});  // 59
+    casillas.push({x: c(6), y: c(14), segura: true});
+    casillas.push({x: c(6), y: c(13), segura: false});
+    casillas.push({x: c(6), y: c(12), segura: false});
+    casillas.push({x: c(6), y: c(11), segura: false});
+    casillas.push({x: c(6), y: c(10), segura: false});
+    casillas.push({x: c(5), y: c(8), segura: true});
+    casillas.push({x: c(4), y: c(8), segura: false});
+    casillas.push({x: c(3), y: c(8), segura: false});
+    casillas.push({x: c(2), y: c(8), segura: false});
     
     // Completar circuito (60-67)
-    casillas.push({x: c(1), y: c(8), segura: false});  // 60
-    casillas.push({x: c(0), y: c(8), segura: false});  // 61
-    casillas.push({x: c(0), y: c(7), segura: false});  // 62
-    casillas.push({x: c(0), y: c(6), segura: true});   // 63 - Segura
-    casillas.push({x: c(1), y: c(6), segura: false});  // 64
-    casillas.push({x: c(2), y: c(6), segura: false});  // 65
-    casillas.push({x: c(3), y: c(6), segura: false});  // 66
-    casillas.push({x: c(4), y: c(6), segura: false});  // 67
+    casillas.push({x: c(1), y: c(8), segura: false});
+    casillas.push({x: c(0), y: c(8), segura: false});
+    casillas.push({x: c(0), y: c(7), segura: false});
+    casillas.push({x: c(0), y: c(6), segura: true});
+    casillas.push({x: c(1), y: c(6), segura: false});
+    casillas.push({x: c(2), y: c(6), segura: false});
+    casillas.push({x: c(3), y: c(6), segura: false});
+    casillas.push({x: c(4), y: c(6), segura: false});
     
     return casillas;
 }
 
-// Posiciones de las casas (donde están las fichas inicialmente)
+// Posiciones de las casas
 const CASAS_POSICIONES = {
     ROJO: [
         {x: 100, y: 580}, {x: 160, y: 580},
@@ -180,27 +176,27 @@ const CASAS_POSICIONES = {
     ]
 };
 
-// Pasillos de meta (6 casillas + meta central)
+// Pasillos de meta
 const PASILLOS_META = {
     ROJO: [
         {x: 400, y: 680}, {x: 400, y: 627}, {x: 400, y: 574},
         {x: 400, y: 521}, {x: 400, y: 468}, {x: 400, y: 415},
-        {x: 400, y: 400} // META
+        {x: 400, y: 400}
     ],
     VERDE: [
         {x: 80, y: 400}, {x: 133, y: 400}, {x: 186, y: 400},
         {x: 239, y: 400}, {x: 292, y: 400}, {x: 345, y: 400},
-        {x: 400, y: 400} // META
+        {x: 400, y: 400}
     ],
     AZUL: [
         {x: 400, y: 80}, {x: 400, y: 133}, {x: 400, y: 186},
         {x: 400, y: 239}, {x: 400, y: 292}, {x: 400, y: 345},
-        {x: 400, y: 400} // META
+        {x: 400, y: 400}
     ],
     AMARILLO: [
         {x: 720, y: 400}, {x: 667, y: 400}, {x: 614, y: 400},
         {x: 561, y: 400}, {x: 508, y: 400}, {x: 455, y: 400},
-        {x: 400, y: 400} // META
+        {x: 400, y: 400}
     ]
 };
 
@@ -291,7 +287,7 @@ function obtenerNombreJugador(color) {
 }
 
 // ============================================
-// WEBSOCKET
+// WEBSOCKET - MEJORADO
 // ============================================
 function conectarWebSocket() {
     console.log('[WS] Intentando conectar a:', WS_URL);
@@ -326,17 +322,28 @@ function conectarWebSocket() {
 }
 
 function enviarMensaje(datos) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        datos.sala = codigoSala;
-        ws.send(JSON.stringify(datos));
-        console.log('[WS] 📤 Mensaje enviado:', datos);
-    } else {
-        console.error('[WS] No se puede enviar, WebSocket no conectado');
+    if (!ws) {
+        console.error('[WS] WebSocket no inicializado');
+        agregarLog('Error: WebSocket no conectado', 'error');
+        return;
     }
+    
+    if (ws.readyState !== WebSocket.OPEN) {
+        console.error('[WS] WebSocket no conectado. Estado:', ws.readyState);
+        console.error('[WS] Estados: CONNECTING=0, OPEN=1, CLOSING=2, CLOSED=3');
+        agregarLog('Error: No hay conexión con el servidor', 'error');
+        return;
+    }
+    
+    datos.sala = codigoSala;
+    const mensajeStr = JSON.stringify(datos);
+    
+    console.log('[WS] 📤 Enviando:', mensajeStr);
+    ws.send(mensajeStr);
 }
 
 // ============================================
-// MANEJO DE MENSAJES - CORREGIDO
+// MANEJO DE MENSAJES
 // ============================================
 function manejarMensaje(mensaje) {
     console.log('[WS] 📨 Procesando:', mensaje.tipo);
@@ -368,7 +375,6 @@ function manejarMensaje(mensaje) {
             break;
             
         case 'FICHAS_DISPONIBLES':
-            // NUEVO: Servidor indica qué fichas pueden moverse
             recibirFichasDisponibles(mensaje);
             break;
             
@@ -382,12 +388,10 @@ function manejarMensaje(mensaje) {
             break;
             
         case 'TURNO_EXTRA':
-            // NUEVO: Manejo específico de turno extra
             procesarTurnoExtra(mensaje);
             break;
             
         case 'PENALIZACION_TRES_SEIS':
-            // NUEVO: Penalización por tres 6
             procesarPenalizacionTresSeis(mensaje);
             break;
             
@@ -408,6 +412,10 @@ function manejarMensaje(mensaje) {
         case 'ERROR':
             mostrarMensajeError(mensaje.mensaje);
             agregarLog(mensaje.mensaje, 'error');
+            // Rehabilitar el dado en caso de error
+            if (estadoJuego.turnoActual === miColor) {
+                setTimeout(() => habilitarDado(), 1000);
+            }
             break;
             
         default:
@@ -580,7 +588,7 @@ function actualizarLobby(datos) {
 // ============================================
 function iniciarJuego(datos) {
     console.log('[JUEGO] ====== PARTIDA INICIADA ======');
-    console.log('[JUEGO] Datos:', datos);
+    console.log('[JUEGO] Datos recibidos:', datos);
     
     estadoJuego.jugadores = datos.jugadores || [];
     estadoJuego.turnoActual = datos.turnoActual;
@@ -588,8 +596,20 @@ function iniciarJuego(datos) {
     estadoJuego.contadorSeis = 0;
     estadoJuego.ultimoDado = 0;
     
-    // Inicializar fichas de cada jugador
+    // VERIFICAR QUE TENGO MI COLOR ASIGNADO
+    console.log('[JUEGO] Mi color asignado:', miColor);
+    if (!miColor) {
+        console.error('[JUEGO] ⚠️ NO TENGO COLOR ASIGNADO');
+        const miJugador = estadoJuego.jugadores.find(j => j.nombre === miNombre);
+        if (miJugador) {
+            miColor = miJugador.color;
+            console.log('[JUEGO] Color recuperado de jugadores:', miColor);
+        }
+    }
+    
+    // Inicializar fichas
     estadoJuego.jugadores.forEach(jugador => {
+        console.log('[JUEGO] Inicializando fichas para:', jugador.nombre, jugador.color);
         for (let i = 1; i <= 4; i++) {
             const fichaId = `${jugador.color}_${i}`;
             estadoJuego.fichas[fichaId] = {
@@ -615,7 +635,6 @@ function iniciarJuego(datos) {
 }
 
 function actualizarInfoJugadores() {
-    // Actualizar los paneles de jugadores en la pantalla de juego
     const paneles = {
         ROJO: { name: document.querySelector('.player-rojo .player-name'), fichas: document.getElementById('fichasRojo') },
         AZUL: { name: document.querySelector('.player-azul .player-name'), fichas: document.getElementById('fichasAzul') },
@@ -623,7 +642,6 @@ function actualizarInfoJugadores() {
         AMARILLO: { name: document.querySelector('.player-amarillo .player-name'), fichas: document.getElementById('fichasAmarillo') }
     };
     
-    // Resetear todos los paneles
     Object.keys(paneles).forEach(color => {
         if (paneles[color].name) {
             paneles[color].name.textContent = color;
@@ -634,7 +652,6 @@ function actualizarInfoJugadores() {
         }
     });
     
-    // Actualizar con datos de jugadores activos
     estadoJuego.jugadores.forEach(jugador => {
         const panel = paneles[jugador.color];
         if (panel) {
@@ -646,7 +663,6 @@ function actualizarInfoJugadores() {
                 panel.name.style.color = esTurno ? '#f4d03f' : '#fff';
             }
             
-            // Contar fichas en meta
             let fichasEnMeta = 0;
             for (let i = 1; i <= 4; i++) {
                 const ficha = estadoJuego.fichas[`${jugador.color}_${i}`];
@@ -892,22 +908,29 @@ function dibujarFicha(x, y, ficha) {
 }
 
 // ============================================
-// LÓGICA DEL DADO
+// LÓGICA DEL DADO - CORREGIDO
 // ============================================
 btnTirarDado.addEventListener('click', tirarDado);
 
 function tirarDado() {
+    console.log('[DADO] === INTENTANDO TIRAR DADO ===');
+    console.log('[DADO] Turno actual:', estadoJuego.turnoActual);
+    console.log('[DADO] Mi color:', miColor);
+    console.log('[DADO] Puedo tirar:', puedeTirarDado);
+    
     if (estadoJuego.turnoActual !== miColor) {
+        console.log('[DADO] ERROR: No es mi turno');
         agregarLog('No es tu turno', 'error');
         return;
     }
     
     if (!puedeTirarDado) {
+        console.log('[DADO] ERROR: No puedo tirar ahora');
         agregarLog('No puedes tirar el dado ahora', 'error');
         return;
     }
     
-    console.log('[DADO] Tirando dado...');
+    console.log('[DADO] ✓ Validación pasada, enviando mensaje...');
     puedeTirarDado = false;
     btnTirarDado.disabled = true;
     
@@ -922,18 +945,25 @@ function tirarDado() {
         }
     }, 80);
     
-    enviarMensaje({ accion: 'TIRAR_DADO' });
-}
-
+    // ENVIAR MENSAJE AL SERVIDOR
+    const mensaje = { 
+        accion: 'TIRAR_DADO'
+    };
+    
+    console.log('[DADO] Enviando mensaje:', mensaje);
+    enviarMensaje(mensaje);
 // ============================================
-// PROCESAR DADO - CORREGIDO
+// PROCESAR DADO - MEJORADO
 // ============================================
 function procesarDado(mensaje) {
+    console.log('[DADO] === PROCESANDO RESULTADO ===');
+    console.log('[DADO] Mensaje completo:', mensaje);
+    
     const valor = mensaje.valor;
     estadoJuego.ultimoDado = valor;
-    estadoJuego.contadorSeis = mensaje.contadorSeis || 0; // NUEVO: Usar valor del servidor
+    estadoJuego.contadorSeis = mensaje.contadorSeis || 0;
     
-    console.log('[DADO] Resultado:', valor, 'Contador 6 (servidor):', estadoJuego.contadorSeis);
+    console.log('[DADO] Resultado:', valor, 'Contador 6:', estadoJuego.contadorSeis);
     
     // Mostrar resultado del dado
     setTimeout(() => {
@@ -944,39 +974,16 @@ function procesarDado(mensaje) {
     const nombreJugador = obtenerNombreJugador(jugador);
     agregarLog(`${nombreJugador} tiró un ${valor}`, 'importante');
     
-    // NUEVO: Si el servidor envía las fichas disponibles directamente
-    if (mensaje.fichasDisponibles) {
-        fichasDisponiblesParaMover = mensaje.fichasDisponibles;
-        mostrarFichasDisponibles();
-        return;
-    }
-    
     // Si es mi turno, verificar fichas disponibles
     if (jugador === miColor || mensaje.jugador === miNombre) {
+        console.log('[DADO] Es mi turno, verificando fichas...');
         setTimeout(() => {
             verificarFichasDisponibles(valor);
         }, 800);
+    } else {
+        console.log('[DADO] No es mi turno');
     }
 }
-
-function mostrarDado(valor) {
-    const imagenesDados = {
-        1: 'assets/D1.jpg',
-        2: 'assets/D2.jpg',
-        3: 'assets/D3.jpg',
-        4: 'assets/D4.jpg',
-        5: 'assets/D5.jpg',
-        6: 'assets/D6.jpg'
-    };
-    
-    // Intentar cargar imagen, si falla mostrar número
-    dado.innerHTML = `<img src="${imagenesDados[valor]}" alt="Dado ${valor}" 
-                           style="width: 100%; height: 100%; border-radius: 15px; object-fit: cover;"
-                           onerror="this.parentElement.innerHTML='<span style=\\'font-size:3em;font-weight:bold;\\'>${valor}</span>'">`;
-    
-    valorDado.textContent = `Valor: ${valor}`;
-}
-
 // ============================================
 // LÓGICA DE MOVIMIENTO
 // ============================================
@@ -1351,3 +1358,4 @@ window.addEventListener('DOMContentLoaded', () => {
     mostrarPantalla(pantallaSeleccion);
     localStorage.removeItem('perfilUsuario');
 });
+}

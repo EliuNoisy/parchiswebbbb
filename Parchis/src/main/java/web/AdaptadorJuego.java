@@ -177,36 +177,53 @@ public class AdaptadorJuego {
     /**
      * Procesa tirada de dado con validación de turno
      */
-    public String tirarDado(String sessionId) {
+     public String tirarDado(String sessionId) {
+        System.out.println("\n========================================");
+        System.out.println("[ADAPTADOR] TIRAR DADO - INICIO");
+        System.out.println("========================================");
+        
         Integer idJugador = jugadorSesion.get(sessionId);
+        System.out.println("[ADAPTADOR] SessionId: " + sessionId);
+        System.out.println("[ADAPTADOR] IdJugador obtenido: " + idJugador);
         
         if (idJugador == null) {
+            System.out.println("[ADAPTADOR] ERROR: Jugador no registrado");
+            System.out.println("[ADAPTADOR] Sesiones registradas: " + jugadorSesion.keySet());
             return crearError("Jugador no registrado");
         }
         
         Jugador jugador = buscarJugadorPorId(idJugador);
+        System.out.println("[ADAPTADOR] Jugador encontrado: " + (jugador != null ? jugador.getNombre() : "NULL"));
         
         if (jugador == null) {
+            System.out.println("[ADAPTADOR] ERROR: Jugador no encontrado en partida");
             return crearError("Jugador no encontrado");
         }
         
         if (partida.getTurnoActual() == null) {
+            System.out.println("[ADAPTADOR] ERROR: La partida no ha iniciado");
             return crearError("La partida no ha iniciado");
         }
         
+        System.out.println("[ADAPTADOR] Turno actual: " + partida.getTurnoActual().getColor());
+        System.out.println("[ADAPTADOR] Color del jugador: " + jugador.getColor());
+        
         if (partida.getTurnoActual().getIdJugador() != jugador.getIdJugador()) {
-            return crearError("No es tu turno. Turno actual: " + partida.getTurnoActual().getColor());
+            String mensaje = "No es tu turno. Turno actual: " + partida.getTurnoActual().getColor();
+            System.out.println("[ADAPTADOR] ERROR: " + mensaje);
+            return crearError(mensaje);
         }
         
+        System.out.println("[ADAPTADOR] ✓ Validación pasada, lanzando dado...");
         int valorDado = partida.getDado().lanzar();
+        System.out.println("[ADAPTADOR] *** DADO LANZADO: " + valorDado + " ***");
         
         if (valorDado == 6) {
             partida.incrementarContadorSeis();
+            System.out.println("[ADAPTADOR] Contador de 6: " + partida.getContadorSeis());
         } else {
             partida.reiniciarContadorSeis();
         }
-        
-        System.out.println("[ADAPTADOR] " + jugador.getNombre() + " tiró: " + valorDado);
         
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("tipo", "DADO_TIRADO");
@@ -215,7 +232,11 @@ public class AdaptadorJuego {
         respuesta.put("valor", valorDado);
         respuesta.put("contadorSeis", partida.getContadorSeis());
         
-        return gson.toJson(respuesta);
+        String jsonRespuesta = gson.toJson(respuesta);
+        System.out.println("[ADAPTADOR] Respuesta JSON: " + jsonRespuesta);
+        System.out.println("========================================\n");
+        
+        return jsonRespuesta;
     }
     
     /**
@@ -569,3 +590,4 @@ public class AdaptadorJuego {
         System.out.println("[ADAPTADOR] Partida reiniciada");
     }
 }
+

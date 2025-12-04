@@ -1,14 +1,5 @@
-/**
- * Capa de control del patron MVC 
- * Coordina la interaccion entre modelo, vista y red
- * Aplica premios de casillas 
- * 
- * VERSIÓN CORREGIDA - Fixes:
- * - Regla del 5 para turno extra
- * - Sincronización correcta de turnos remotos
- * - Contador de 6 consecutivos arreglado
- * - Cambio de turno sin duplicados
- */
+
+
 package controlador;
 
 import java.util.ArrayList;
