@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parchís Online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kufam:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA 1: SELECCIÓN DE USUARIO             -->
+    <!-- ============================================ -->
+    <div id="pantallaSeleccion" class="pantalla">
+        <h1 class="titulo">🎲 PARCHÍS ONLINE 🎲</h1>
+        
+        <div class="contenido-central">
+            <h2 class="subtitulo">Crea tu perfil</h2>
+            
+            <input 
+                type="text" 
+                id="inputNombre" 
+                class="input-nombre" 
+                placeholder="Ingresa tu nombre" 
+                maxlength="15"
+                autocomplete="off">
+            
+            <h3 class="subtitulo">Elige tu avatar</h3>
+            
+            <div class="galeria-avatares">
+                <div class="avatar-opcion" data-avatar="personaje0">
+                    <img src="assets/personaje0.jpg" alt="Kirby">
+                </div>
+                <div class="avatar-opcion" data-avatar="personaje1">
+                    <img src="assets/personaje1.jpg" alt="Personaje Anime">
+                </div>
+                <div class="avatar-opcion" data-avatar="personaje2">
+                    <img src="assets/personaje2.jpg" alt="Gatito">
+                </div>
+                <div class="avatar-opcion" data-avatar="personaje3">
+                    <img src="assets/personaje3.jpg" alt="Canela">
+                </div>
+            </div>
+            
+            <button id="btnContinuar" class="btn-principal" disabled>
+                CONTINUAR
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA 2: MENÚ PRINCIPAL                   -->
+    <!-- ============================================ -->
+    <div id="pantallaPrincipal" class="pantalla hidden">
+        <header>
+            <div class="contenedor-izquierdo">
+                <div class="tarjeta user">
+                    <img id="avatarUsuario" src="assets/personaje0.jpg" alt="Avatar" class="img-usuario">
+                    <span id="nombreUsuario" class="nombre-usuario">Jugador</span>
+                </div>
+                
+                <div class="contador-monedas">
+                    <div class="moneda-icono">
+                        <img src="assets/moneda-oro-dinero-icono-dolar-9.jpg" alt="Moneda">
+                    </div>
+                    <span class="cantidad-monedas">1000</span>
+                </div>
+            </div>
+            
+            <div class="boton-config" id="btnConfiguracion">
+                <img src="assets/Confi.jpg" alt="Configuración" style="width: 30px; height: 30px; border-radius: 50%;">
+            </div>
+        </header>
+
+        <div class="contenido-central" style="margin-top: 120px;">
+            <h1 class="titulo">¡Bienvenido!</h1>
+            
+            <h2 class="subtitulo">Unirse a una sala</h2>
+            <div class="contenedor-codigo">
+                <input 
+                    type="text" 
+                    id="inputCodigo" 
+                    class="input-codigo" 
+                    placeholder="0000000"
+                    maxlength="7"
+                    inputmode="numeric">
+                <button id="btnUnirse" class="boton-unirse">UNIRSE</button>
+            </div>
+            
+            <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
+            
+            <div style="text-align: center; margin: 30px 0; color: #888;">
+                <span>- O -</span>
+            </div>
+            
+            <button id="btnCrearSala" class="boton-crear">
+                CREAR NUEVA SALA
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA 3: SALA DE ESPERA                   -->
+    <!-- ============================================ -->
+    <div id="pantallaSalaEspera" class="pantalla hidden">
+        <div class="container-sala">
+            <div class="header-sala">
+                <div class="codigo-sala">
+                    <span>Código de sala:</span>
+                    <strong id="codigoSalaDisplay">0000000</strong>
+                    <button id="btnCopiarCodigo" class="btn-copiar">📋</button>
+                </div>
+                <button id="btnSalir" class="btn-salir">SALIR</button>
+            </div>
+            
+            <h2 class="subtitulo" style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+                <img src="assets/cargando.jpg" alt="Cargando" style="width: 40px; height: 40px;">
+                Esperando jugadores...
+            </h2>
+            
+            <div id="listaJugadores" class="lista-jugadores">
+                <div class="jugador-vacio">Esperando jugador...</div>
+                <div class="jugador-vacio">Esperando jugador...</div>
+                <div class="jugador-vacio">Esperando jugador...</div>
+                <div class="jugador-vacio">Esperando jugador...</div>
+            </div>
+            
+            <p class="contador">
+                <img src="assets/Estrella.jpg" alt="Estrella" style="width: 20px; vertical-align: middle;">
+                Jugadores: <span id="numJugadores">0</span>/4
+            </p>
+            
+            <button id="btnIniciarPartida" class="btn-principal" disabled>
+                INICIAR PARTIDA
+            </button>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- PANTALLA 4: JUEGO                            -->
+    <!-- ============================================ -->
+    <div id="pantallaJuego" class="pantalla hidden">
+        <div class="game-layout">
+            <!-- Jugador ROJO (arriba izquierda) -->
+            <div class="player-info player-rojo">
+                <div class="player-name">ROJO</div>
+                <div class="player-fichas" id="fichasRojo">0/4</div>
+            </div>
+            
+            <!-- Jugador AZUL (arriba derecha) -->
+            <div class="player-info player-azul">
+                <div class="player-name">AZUL</div>
+                <div class="player-fichas" id="fichasAzul">0/4</div>
+            </div>
+            
+            <!-- Jugador VERDE (abajo izquierda) -->
+            <div class="player-info player-verde">
+                <div class="player-name">VERDE</div>
+                <div class="player-fichas" id="fichasVerde">0/4</div>
+            </div>
+            
+            <!-- Jugador AMARILLO (abajo derecha) -->
+            <div class="player-info player-amarillo">
+                <div class="player-name">AMARILLO</div>
+                <div class="player-fichas" id="fichasAmarillo">0/4</div>
+            </div>
+            
+            <!-- TABLERO CENTRAL -->
+            <div class="tablero-container">
+                <canvas id="tablero" width="800" height="800"></canvas>
+            </div>
+            
+            <!-- DADO Y CONTROLES (izquierda) -->
+            <div class="dado-container">
+                <div class="dado" id="dado">
+                    <img src="assets/D3.jpg" alt="Dado" style="width: 100%; height: 100%; border-radius: 15px;">
+                </div>
+                <div class="valor-dado" id="valorDado">Lanza el dado</div>
+                <button id="btnTirarDado" class="btn-dado">TIRAR</button>
+            </div>
+            
+            <!-- LOG DE EVENTOS (derecha) -->
+            <div class="log-container">
+                <h3>📜 Registro</h3>
+                <div id="logEventos" class="log-eventos">
+                    <p>Bienvenido al juego</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
