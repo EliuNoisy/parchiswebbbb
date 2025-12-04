@@ -1,0 +1,106 @@
+{
+  "inicioPartida": "2025-11-03T00:22:27.625914500",
+  "finPartida": "2025-11-03T00:23:56.459182500",
+  "totalEventos": 13,
+  "eventos": [
+    {
+      "tipo": "INICIO_PARTIDA",
+      "timestamp": "2025-11-03T00:23:00.158445600",
+      "descripcion": "Partida iniciada",
+      "jugador1": "eliu",
+      "jugador2": "alexa"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T00:23:05.814618900",
+      "descripcion": "eliu lanzo el dado y obtuvo 5",
+      "jugador": "eliu",
+      "valorDado": 5
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T00:23:08.980865500",
+      "descripcion": "eliu saco ficha 1 de casa",
+      "jugador": "eliu",
+      "fichaId": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T00:23:09.007729800",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T00:23:21.340534400",
+      "descripcion": "alexa saco ficha 5 de casa",
+      "jugador": "alexa",
+      "fichaId": 5
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T00:23:26.572867900",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T00:23:29.762804900",
+      "descripcion": "eliu movio ficha 1 de casilla 5 a 6",
+      "jugador": "eliu",
+      "fichaId": 1,
+      "posicionInicial": 5,
+      "posicionFinal": 6
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T00:23:29.784273500",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T00:23:39.314580800",
+      "descripcion": "alexa movio ficha 5 de casilla 22 a 28",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 22,
+      "posicionFinal": 28
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T00:23:46.961070500",
+      "descripcion": "alexa movio ficha 5 de casilla 28 a 32",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 28,
+      "posicionFinal": 32
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T00:23:49.303594800",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T00:23:52.371211500",
+      "descripcion": "eliu movio ficha 1 de casilla 6 a 7",
+      "jugador": "eliu",
+      "fichaId": 1,
+      "posicionInicial": 6,
+      "posicionFinal": 7
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T00:23:52.373218200",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    }
+  ]
+}

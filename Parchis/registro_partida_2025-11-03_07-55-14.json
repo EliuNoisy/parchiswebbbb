@@ -1,0 +1,86 @@
+{
+  "inicioPartida": "2025-11-03T07:55:14.568321400",
+  "finPartida": "2025-11-03T07:56:30.254133200",
+  "totalEventos": 11,
+  "eventos": [
+    {
+      "tipo": "INICIO_PARTIDA",
+      "timestamp": "2025-11-03T07:55:46.963933700",
+      "descripcion": "Partida iniciada",
+      "jugador1": "eliu",
+      "jugador2": "alexa"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T07:55:54.700240200",
+      "descripcion": "eliu lanzo el dado y obtuvo 5",
+      "jugador": "eliu",
+      "valorDado": 5
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T07:55:56.244544600",
+      "descripcion": "eliu saco ficha 1 de casa",
+      "jugador": "eliu",
+      "fichaId": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T07:55:56.258541900",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T07:56:05.218686900",
+      "descripcion": "eliu lanzo el dado y obtuvo 5",
+      "jugador": "eliu",
+      "valorDado": 5
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T07:56:08.201249300",
+      "descripcion": "eliu saco ficha 2 de casa",
+      "jugador": "eliu",
+      "fichaId": 2
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T07:56:08.204254",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T07:56:21.207048100",
+      "descripcion": "alexa saco ficha 5 de casa",
+      "jugador": "alexa",
+      "fichaId": 5
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T07:56:24.209577400",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T07:56:26.667594200",
+      "descripcion": "eliu movio ficha 2 de casilla 5 a 8",
+      "jugador": "eliu",
+      "fichaId": 2,
+      "posicionInicial": 5,
+      "posicionFinal": 8
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T07:56:26.697709500",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    }
+  ]
+}

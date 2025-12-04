@@ -1,0 +1,212 @@
+{
+  "inicioPartida": "2025-11-03T08:38:46.112091100",
+  "finPartida": "2025-11-03T08:40:33.138826",
+  "totalEventos": 28,
+  "eventos": [
+    {
+      "tipo": "INICIO_PARTIDA",
+      "timestamp": "2025-11-03T08:39:19.929918800",
+      "descripcion": "Partida iniciada",
+      "jugador1": "eliu",
+      "jugador2": "alexa"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:24.917200300",
+      "descripcion": "eliu lanzo el dado y obtuvo 6",
+      "jugador": "eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-03T08:39:24.918200",
+      "descripcion": "eliu obtuvo turno extra por sacar 6",
+      "jugador": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:29.803128200",
+      "descripcion": "eliu lanzo el dado y obtuvo 4",
+      "jugador": "eliu",
+      "valorDado": 4
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:39:29.809133900",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:36.015287800",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:39:36.016287700",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:41.786675300",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:39:41.787582800",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:46.435325",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:39:46.436320800",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:39:50.432954500",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:39:50.433954700",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T08:39:57.103845200",
+      "descripcion": "alexa saco ficha 5 de casa",
+      "jugador": "alexa",
+      "fichaId": 5
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:40:00.977705",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:40:00.977705",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T08:40:05.951856",
+      "descripcion": "alexa movio ficha 5 de casilla 22 a 26",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 22,
+      "posicionFinal": 26
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:40:08.512492100",
+      "descripcion": "eliu lanzo el dado y obtuvo 5",
+      "jugador": "eliu",
+      "valorDado": 5
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-03T08:40:10.398146200",
+      "descripcion": "eliu saco ficha 1 de casa",
+      "jugador": "eliu",
+      "fichaId": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:40:10.400146900",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T08:40:14.760529",
+      "descripcion": "alexa movio ficha 5 de casilla 26 a 27",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 26,
+      "posicionFinal": 27
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:40:18.379730200",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T08:40:22.160592500",
+      "descripcion": "eliu movio ficha 1 de casilla 5 a 6",
+      "jugador": "eliu",
+      "fichaId": 1,
+      "posicionInicial": 5,
+      "posicionFinal": 6
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:40:22.160592500",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T08:40:25.776824600",
+      "descripcion": "alexa movio ficha 5 de casilla 27 a 31",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 27,
+      "posicionFinal": 31
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-03T08:40:30.137724200",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-03T08:40:33.135825200",
+      "descripcion": "eliu movio ficha 1 de casilla 6 a 7",
+      "jugador": "eliu",
+      "fichaId": 1,
+      "posicionInicial": 6,
+      "posicionFinal": 7
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-03T08:40:33.136824800",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    }
+  ]
+}
