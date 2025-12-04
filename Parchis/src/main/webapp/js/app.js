@@ -285,6 +285,10 @@ function obtenerNombreJugador(color) {
     const jugador = estadoJuego.jugadores.find(j => j.color === color);
     return jugador ? jugador.nombre : color;
 }
+function mostrarDado(valor) {
+    valorDado.textContent = `Resultado: ${valor}`;
+    dado.innerHTML = `<img src="assets/D${valor}.jpg" alt="Dado ${valor}" style="width: 100%; height: 100%; border-radius: 15px;" onerror="this.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:4rem;font-weight:bold;color:#1a1a2e;\\'>${valor}</div>'">`;
+}
 
 // ============================================
 // WEBSOCKET - MEJORADO
@@ -952,6 +956,7 @@ function tirarDado() {
     
     console.log('[DADO] Enviando mensaje:', mensaje);
     enviarMensaje(mensaje);
+}
 // ============================================
 // PROCESAR DADO - MEJORADO
 // ============================================
@@ -1358,4 +1363,7 @@ window.addEventListener('DOMContentLoaded', () => {
     mostrarPantalla(pantallaSeleccion);
     localStorage.removeItem('perfilUsuario');
 });
-}
+
+
+
+
