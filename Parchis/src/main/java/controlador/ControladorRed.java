@@ -7,7 +7,7 @@ import dispatcher.manejadores.*;
 
 /**
  * Controlador de red refactorizado con Dispatcher
-
+ * VERSIÓN CORREGIDA - Sincronización mejorada
  */
 public class ControladorRed implements EscuchaRed {
     private P2PNetworkManager gestorRed;
@@ -21,6 +21,10 @@ public class ControladorRed implements EscuchaRed {
     private boolean inicioPartidaRecibido = false;
     private final Object lockNombre = new Object();
     private final Object lockInicio = new Object();
+    
+    // NUEVO: Para sincronización de tiradas de dado remotas
+    private Integer ultimoValorDadoRemoto = null;
+    private final Object lockDado = new Object();
     
     public ControladorRed(String nombreJugador, int puerto, Tablero tablero, int jugadorLocalId) {
         int puertoLocal = puerto;
@@ -179,6 +183,7 @@ public class ControladorRed implements EscuchaRed {
         int jugadorId = jugador.getIdJugador();
         int fichaId = ficha.getIdFicha();
         gestorRed.enviarMovimiento(jugadorId, fichaId, valorDado);
+        System.out.println("[RED] -> Movimiento enviado (J:" + jugadorId + " F:" + fichaId + " D:" + valorDado + ")");
     }
     
     /**
@@ -187,6 +192,7 @@ public class ControladorRed implements EscuchaRed {
     public void notificarCambioTurno(Jugador siguienteJugador) {
         int jugadorId = siguienteJugador.getIdJugador();
         gestorRed.enviarCambioTurno(jugadorId);
+        System.out.println("[RED] -> Cambio de turno enviado (Jugador " + jugadorId + ")");
     }
     
     /**
@@ -194,6 +200,7 @@ public class ControladorRed implements EscuchaRed {
      */
     public void enviarTiradaDado(int valor) {
         gestorRed.enviarTiradaDado(valor);
+        System.out.println("[RED] -> Tirada de dado enviada (Valor: " + valor + ")");
     }
     
     /**
@@ -207,7 +214,7 @@ public class ControladorRed implements EscuchaRed {
     public void alRecibirMensaje(MensajeJuego mensaje, ConexionPeer desde) {
         System.out.println("[RED] <- " + mensaje.getTipo() + " de " + mensaje.getEmisor());
         
-        // DELEGACION AL DISPATCHER - UNA SOLA LINEA
+        // DELEGACION AL DISPATCHER
         dispatcher.despachar(mensaje, desde);
     }
     
@@ -250,51 +257,97 @@ public class ControladorRed implements EscuchaRed {
             int fichaId = Integer.parseInt(partes[1].split(":")[1]);
             int dado = Integer.parseInt(partes[2].split(":")[1]);
             
+            System.out.println("[RED] <- Movimiento recibido (J:" + jugadorId + " F:" + fichaId + " D:" + dado + ")");
+            
             if (jugadorId != jugadorLocalId) {
-                System.out.println("\n[RED] Procesando movimiento del oponente...");
                 if (controladorPartida != null) {
                     controladorPartida.aplicarMovimientoRemoto(jugadorId, fichaId, dado);
-                    System.out.println("[RED] Movimiento sincronizado");
+                    System.out.println("[RED] ✓ Movimiento sincronizado");
                 }
+            } else {
+                System.out.println("[RED] ⚠ Movimiento propio ignorado (eco)");
             }
             
         } catch (Exception e) {
-            System.err.println("[RED] Error procesando movimiento: " + e.getMessage());
+            System.err.println("[RED] ✗ Error procesando movimiento: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
     /**
-     * Procesa cambio de turno
+     * CORREGIDO: Procesa cambio de turno con mejor sincronización
      */
     public void procesarCambioTurno(MensajeJuego mensaje) {
         try {
             int jugadorId = Integer.parseInt(mensaje.getContenido());
             
+            System.out.println("[RED] <- Cambio de turno recibido (Jugador " + jugadorId + ")");
+            
             if (controladorPartida != null) {
+                // Aplicar el cambio de turno
                 controladorPartida.aplicarCambioTurnoRemoto(jugadorId);
                 
+                // NUEVO: Notificar claramente quién tiene el turno
                 if (jugadorId == jugadorLocalId) {
                     System.out.println("\n================================================");
-                    System.out.println("              ES TU TURNO!");
+                    System.out.println("          🎯 ¡ES TU TURNO! 🎯");
                     System.out.println("================================================");
+                    
+                    // NUEVO: Notificar al adaptador web si existe
+                    notificarCambioTurnoAWeb(jugadorId, true);
                 } else {
-                    System.out.println("\n[RED] Turno del oponente iniciado");
+                    System.out.println("\n[RED] ⏳ Turno del oponente");
+                    notificarCambioTurnoAWeb(jugadorId, false);
                 }
+            } else {
+                System.err.println("[RED] ⚠ ControladorPartida no inicializado");
             }
+            
         } catch (Exception e) {
-            System.err.println("[RED] Error procesando cambio de turno: " + e.getMessage());
+            System.err.println("[RED] ✗ Error procesando cambio de turno: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
     /**
-     * Procesa tirada de dado
+     * NUEVO: Notifica al frontend web sobre el cambio de turno
+     */
+    private void notificarCambioTurnoAWeb(int jugadorId, boolean esTurnoLocal) {
+        // Este método se puede usar para enviar eventos al WebSocket del frontend
+        // Por ahora solo registra, pero puedes expandirlo
+        System.out.println("[WEB] Notificación de turno: Jugador " + jugadorId + 
+                         (esTurnoLocal ? " (LOCAL)" : " (REMOTO)"));
+    }
+    
+    /**
+     * CORREGIDO: Procesa tirada de dado y notifica al controlador
      */
     public void procesarTiradaDado(MensajeJuego mensaje) {
         try {
             int valor = Integer.parseInt(mensaje.getContenido());
-            System.out.println("[RED] " + mensaje.getEmisor() + " lanzo el dado: " + valor);
+            
+            synchronized (lockDado) {
+                ultimoValorDadoRemoto = valor;
+                System.out.println("[RED] <- Tirada de dado recibida: " + valor);
+                lockDado.notifyAll();
+            }
+            
+            // NUEVO: Mostrar en consola para debugging
+            System.out.println("[RED] 🎲 " + mensaje.getEmisor() + " sacó: " + valor);
+            
         } catch (Exception e) {
-            System.err.println("[RED] Error procesando tirada de dado: " + e.getMessage());
+            System.err.println("[RED] ✗ Error procesando tirada de dado: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * NUEVO: Obtiene el último valor del dado recibido remotamente
+     */
+    public Integer obtenerUltimoValorDadoRemoto() {
+        synchronized (lockDado) {
+            Integer valor = ultimoValorDadoRemoto;
+            ultimoValorDadoRemoto = null; // Limpiar después de leer
+            return valor;
         }
     }
     
@@ -302,18 +355,21 @@ public class ControladorRed implements EscuchaRed {
      * Procesa mensaje de chat
      */
     public void procesarChat(MensajeJuego mensaje) {
-        System.out.println("\n[" + mensaje.getEmisor() + "]: " + mensaje.getContenido());
+        System.out.println("\n💬 [" + mensaje.getEmisor() + "]: " + mensaje.getContenido());
     }
     
     public void setControladorPartida(ControladorPartida controlador) {
         this.controladorPartida = controlador;
+        System.out.println("[RED] ControladorPartida vinculado");
     }
     
     public void cerrar() {
+        System.out.println("[RED] Cerrando conexiones...");
         gestorRed.cerrar();
         if (dispatcher != null) {
             dispatcher.limpiar();
         }
+        System.out.println("[RED] Conexiones cerradas");
     }
     
     public boolean esAnfitrion() {
@@ -330,5 +386,13 @@ public class ControladorRed implements EscuchaRed {
      */
     public java.util.List<ConexionPeer> getPeersConectados() {
         return gestorRed.getPeersConectados();
+    }
+    
+    /**
+
+     */
+    public boolean hayConexionActiva() {
+        java.util.List<ConexionPeer> peers = getPeersConectados();
+        return peers != null && !peers.isEmpty();
     }
 }

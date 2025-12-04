@@ -48,7 +48,7 @@ const CASILLAS_SALIDA = {
 
 // Casillas donde cada color entra a su pasillo de meta
 const ENTRADA_PASILLO = {
-    ROJO: 67,   // Antes de casilla 68, entra al pasillo
+    ROJO: 67,
     VERDE: 16,
     AZUL: 33,
     AMARILLO: 50
@@ -335,7 +335,12 @@ function enviarMensaje(datos) {
     }
 }
 
+// ============================================
+// MANEJO DE MENSAJES - CORREGIDO
+// ============================================
 function manejarMensaje(mensaje) {
+    console.log('[WS] 📨 Procesando:', mensaje.tipo);
+    
     switch (mensaje.tipo) {
         case 'CONEXION_EXITOSA':
             console.log('[WS] Conexión establecida');
@@ -362,6 +367,11 @@ function manejarMensaje(mensaje) {
             procesarDado(mensaje);
             break;
             
+        case 'FICHAS_DISPONIBLES':
+            // NUEVO: Servidor indica qué fichas pueden moverse
+            recibirFichasDisponibles(mensaje);
+            break;
+            
         case 'FICHA_MOVIDA':
         case 'MOVIMIENTO_REALIZADO':
             procesarMovimiento(mensaje);
@@ -369,6 +379,16 @@ function manejarMensaje(mensaje) {
             
         case 'FICHA_COMIDA':
             procesarFichaComida(mensaje);
+            break;
+            
+        case 'TURNO_EXTRA':
+            // NUEVO: Manejo específico de turno extra
+            procesarTurnoExtra(mensaje);
+            break;
+            
+        case 'PENALIZACION_TRES_SEIS':
+            // NUEVO: Penalización por tres 6
+            procesarPenalizacionTresSeis(mensaje);
             break;
             
         case 'ESTADO_JUEGO':
@@ -389,6 +409,9 @@ function manejarMensaje(mensaje) {
             mostrarMensajeError(mensaje.mensaje);
             agregarLog(mensaje.mensaje, 'error');
             break;
+            
+        default:
+            console.warn('[WS] ⚠️ Tipo de mensaje no manejado:', mensaje.tipo);
     }
 }
 
@@ -902,12 +925,15 @@ function tirarDado() {
     enviarMensaje({ accion: 'TIRAR_DADO' });
 }
 
+// ============================================
+// PROCESAR DADO - CORREGIDO
+// ============================================
 function procesarDado(mensaje) {
     const valor = mensaje.valor;
     estadoJuego.ultimoDado = valor;
-    estadoJuego.contadorSeis = mensaje.contadorSeis || 0;
+    estadoJuego.contadorSeis = mensaje.contadorSeis || 0; // NUEVO: Usar valor del servidor
     
-    console.log('[DADO] Resultado:', valor, 'Contador 6:', estadoJuego.contadorSeis);
+    console.log('[DADO] Resultado:', valor, 'Contador 6 (servidor):', estadoJuego.contadorSeis);
     
     // Mostrar resultado del dado
     setTimeout(() => {
@@ -917,6 +943,13 @@ function procesarDado(mensaje) {
     const jugador = mensaje.jugador || mensaje.color;
     const nombreJugador = obtenerNombreJugador(jugador);
     agregarLog(`${nombreJugador} tiró un ${valor}`, 'importante');
+    
+    // NUEVO: Si el servidor envía las fichas disponibles directamente
+    if (mensaje.fichasDisponibles) {
+        fichasDisponiblesParaMover = mensaje.fichasDisponibles;
+        mostrarFichasDisponibles();
+        return;
+    }
     
     // Si es mi turno, verificar fichas disponibles
     if (jugador === miColor || mensaje.jugador === miNombre) {
@@ -978,29 +1011,43 @@ function verificarFichasDisponibles(valorDado) {
     
     if (fichasDisponiblesParaMover.length === 0) {
         agregarLog('No hay fichas disponibles para mover');
-        
-        if (valorDado !== 6) {
-            // Pasar turno automáticamente
-            setTimeout(() => {
-                console.log('[TURNO] Pasando turno (sin fichas)');
-                enviarMensaje({ accion: 'CAMBIAR_TURNO' });
-            }, 1500);
-        } else {
-            // Sacó 6 pero no puede mover, puede tirar de nuevo
-            agregarLog('¡Sacaste 6! Tira de nuevo', 'exito');
-            habilitarDado();
-        }
-    } else if (fichasDisponiblesParaMover.length === 1) {
+        // El servidor manejará el cambio de turno automáticamente
+    } else {
+        mostrarFichasDisponibles();
+    }
+}
+
+// ============================================
+// NUEVO: Mostrar fichas disponibles
+// ============================================
+function mostrarFichasDisponibles() {
+    if (fichasDisponiblesParaMover.length === 1) {
         // Solo una ficha, mover automáticamente
         agregarLog('Moviendo ficha automáticamente...');
         setTimeout(() => {
             moverFichaSeleccionada(fichasDisponiblesParaMover[0]);
         }, 500);
-    } else {
+    } else if (fichasDisponiblesParaMover.length > 1) {
         // Varias fichas disponibles
         esperandoSeleccionFicha = true;
-        agregarLog('Selecciona una ficha para mover', 'turno');
+        agregarLog('🎯 Selecciona una ficha para mover', 'turno');
         dibujarTablero(); // Redibujar para mostrar fichas resaltadas
+    }
+}
+
+// ============================================
+// NUEVO: Recibir fichas disponibles del servidor
+// ============================================
+function recibirFichasDisponibles(mensaje) {
+    fichasDisponiblesParaMover = mensaje.fichas || [];
+    
+    console.log('[FICHAS] Servidor indica fichas disponibles:', fichasDisponiblesParaMover);
+    
+    if (fichasDisponiblesParaMover.length === 0) {
+        agregarLog('No hay fichas disponibles para mover');
+        // El servidor cambiará el turno automáticamente
+    } else {
+        mostrarFichasDisponibles();
     }
 }
 
@@ -1094,34 +1141,85 @@ function procesarMovimiento(mensaje) {
     dibujarTablero();
     actualizarInfoJugadores();
     
-    // Manejar post-movimiento si es mi turno
+    // CORREGIDO: Ya no maneja post-movimiento localmente
+    // El servidor enviará TURNO_EXTRA o TURNO_CAMBIADO
     const esmiTurno = (mensaje.jugador === miNombre) || (mensaje.color === miColor);
     if (esmiTurno) {
         manejarPostMovimiento();
     }
 }
 
+// ============================================
+// POST-MOVIMIENTO - CORREGIDO
+// ============================================
 function manejarPostMovimiento() {
-    console.log('[POST-MOV] Dado:', estadoJuego.ultimoDado, 'ContadorSeis:', estadoJuego.contadorSeis);
+    console.log('[POST-MOV] Esperando respuesta del servidor...');
     
-    if (estadoJuego.ultimoDado === 6) {
-        estadoJuego.contadorSeis++;
-        
-        if (estadoJuego.contadorSeis >= 3) {
-            agregarLog('¡Tres 6 seguidos! Pierdes el turno', 'error');
-            setTimeout(() => {
-                enviarMensaje({ accion: 'CAMBIAR_TURNO' });
-            }, 1000);
+    // Deshabilitar el dado temporalmente mientras el servidor decide
+    deshabilitarDado();
+    
+    // El servidor decidirá:
+    // - Enviar TURNO_EXTRA si corresponde (6 o 5+ficha)
+    // - Enviar PENALIZACION_TRES_SEIS si sacó tres 6
+    // - Enviar TURNO_CAMBIADO para pasar al siguiente jugador
+    
+    // No hacer nada más aquí, esperar mensaje del servidor
+}
+
+// ============================================
+// NUEVO: Procesar turno extra
+// ============================================
+function procesarTurnoExtra(mensaje) {
+    const motivo = mensaje.motivo || ''; // 'SACO_SEIS' o 'SACO_CINCO_Y_FICHA'
+    const contador = mensaje.contadorSeis || 0;
+    
+    console.log('[TURNO_EXTRA] Motivo:', motivo, 'Contador:', contador);
+    
+    estadoJuego.contadorSeis = contador; // Actualizar contador
+    
+    if (motivo === 'SACO_SEIS') {
+        if (contador >= 3) {
+            // Esto no debería pasar aquí, pero por seguridad
+            agregarLog('¡Tres 6 seguidos! El servidor manejará la penalización', 'error');
         } else {
-            agregarLog(`¡Sacaste 6! Tira de nuevo (${estadoJuego.contadorSeis}/3)`, 'exito');
-            habilitarDado();
+            agregarLog(`¡Sacaste 6! Tira de nuevo (${contador}/3)`, 'exito');
         }
+    } else if (motivo === 'SACO_CINCO_Y_FICHA') {
+        agregarLog('¡Sacaste 5 y una ficha! Tienes turno extra', 'exito');
     } else {
-        // No sacó 6, pasar turno
-        setTimeout(() => {
-            enviarMensaje({ accion: 'CAMBIAR_TURNO' });
-        }, 1500);
+        agregarLog('¡Turno extra!', 'exito');
     }
+    
+    // El servidor confirmó el turno extra, habilitar dado
+    if (mensaje.color === miColor || mensaje.jugador === miNombre) {
+        setTimeout(() => {
+            habilitarDado();
+        }, 500);
+    }
+}
+
+// ============================================
+// NUEVO: Procesar penalización de tres 6
+// ============================================
+function procesarPenalizacionTresSeis(mensaje) {
+    const fichaId = mensaje.fichaId;
+    const ficha = estadoJuego.fichas[fichaId];
+    
+    if (ficha) {
+        ficha.enCasa = true;
+        ficha.posicion = -1;
+        ficha.enPasillo = false;
+        ficha.posicionPasillo = -1;
+    }
+    
+    const jugadorNombre = obtenerNombreJugador(mensaje.jugador || mensaje.color);
+    agregarLog(`¡${jugadorNombre} sacó tres 6 seguidos! Ficha regresa a casa`, 'error');
+    
+    estadoJuego.contadorSeis = 0; // Reiniciar contador
+    
+    dibujarTablero();
+    
+    // El turno cambiará automáticamente después
 }
 
 function procesarFichaComida(mensaje) {
@@ -1141,13 +1239,13 @@ function procesarFichaComida(mensaje) {
 }
 
 // ============================================
-// CAMBIO DE TURNO
+// CAMBIO DE TURNO - CORREGIDO
 // ============================================
 function cambiarTurno(mensaje) {
     console.log('[TURNO] Cambiando a:', mensaje.turnoActual);
     
     estadoJuego.turnoActual = mensaje.turnoActual;
-    estadoJuego.contadorSeis = 0;
+    estadoJuego.contadorSeis = mensaje.contadorSeis || 0; // NUEVO: Usar valor del servidor
     estadoJuego.ultimoDado = 0;
     fichasDisponiblesParaMover = [];
     esperandoSeleccionFicha = false;
@@ -1156,7 +1254,8 @@ function cambiarTurno(mensaje) {
     actualizarInfoJugadores();
     dibujarTablero();
     
-    agregarLog(`Turno de: ${obtenerNombreJugador(mensaje.turnoActual)}`, 'turno');
+    const nombreJugador = obtenerNombreJugador(mensaje.turnoActual);
+    agregarLog(`Turno de: ${nombreJugador}`, 'turno');
 }
 
 function actualizarTurno() {
@@ -1206,6 +1305,10 @@ function actualizarEstadoJuego(mensaje) {
     if (mensaje.turnoActual) {
         estadoJuego.turnoActual = mensaje.turnoActual;
         actualizarTurno();
+    }
+    
+    if (mensaje.contadorSeis !== undefined) {
+        estadoJuego.contadorSeis = mensaje.contadorSeis;
     }
 }
 
