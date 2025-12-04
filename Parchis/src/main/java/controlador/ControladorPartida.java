@@ -1,5 +1,3 @@
-
-
 package controlador;
 
 import java.util.ArrayList;
@@ -22,7 +20,7 @@ public class ControladorPartida {
     private int jugadorLocalId;
     private int casillasPremio;
     private AtomicBoolean procesandoPremio;
-    private int ultimoValorDado; // NUEVO: Para rastrear el último valor del dado
+    private int ultimoValorDado;
     
     public ControladorPartida(Partida partida, PantallaPartida vista, Scanner scanner, int jugadorLocalId) {
         this.partida = partida;
@@ -108,7 +106,7 @@ public class ControladorPartida {
         RegistroPartidaJSON registro = partida.getRegistroJSON();
         
         int valorDado = dado.lanzar();
-        ultimoValorDado = valorDado; // NUEVO: Guardar el valor
+        ultimoValorDado = valorDado;
         vista.mostrarResultadoDado(valorDado);
         
         registro.registrarTiradaDado(jugadorActual.getNombre(), valorDado);
@@ -117,11 +115,17 @@ public class ControladorPartida {
             controladorRed.enviarTiradaDado(valorDado);
         }
         
+        // ========================================
+        // ✅ CORREGIDO: Verificar fichas disponibles
+        // ========================================
         List<Ficha> fichasDisponibles = jugadorActual.getFichasDisponibles(valorDado);
         
         if (fichasDisponibles.isEmpty()) {
             vista.mostrarMensaje("No tienes fichas disponibles para mover. Pierdes el turno.");
-            aplicarReglasDelTurno(valorDado, false); // MODIFICADO: indicar que no hubo movimiento
+            
+            // ✅ IMPORTANTE: NO aplicar reglas de turno extra
+            // Cambiar turno directamente sin verificar 6
+            cambiarTurnoDirectamente();
             return;
         }
         
@@ -137,7 +141,7 @@ public class ControladorPartida {
         Ficha fichaSeleccionada = fichasDisponibles.get(seleccion - 1);
         
         moverFicha(fichaSeleccionada, valorDado, true);
-        aplicarReglasDelTurno(valorDado, true); // MODIFICADO: indicar que hubo movimiento
+        aplicarReglasDelTurno(valorDado, true);
     }
     
     private int solicitarSeleccionFicha(int maxOpciones) {
@@ -250,7 +254,6 @@ public class ControladorPartida {
             return;
         }
         
-        // Validar que el movimiento remoto sea legal
         if (!validarMovimientoRemoto(ficha, pasos, jugador)) {
             System.err.println("[ERROR] Movimiento remoto invalido rechazado");
             return;
@@ -263,22 +266,18 @@ public class ControladorPartida {
      * Valida que un movimiento recibido por red sea legal
      */
     private boolean validarMovimientoRemoto(Ficha ficha, int pasos, Jugador jugador) {
-        // Validar rango del dado
         if (pasos < 1 || pasos > 6) {
             return false;
         }
         
-        // No se puede mover una ficha en meta
         if (ficha.isEnMeta()) {
             return false;
         }
         
-        // Si esta en casa, solo puede salir con 5
         if (ficha.isEnCasa() && pasos != 5) {
             return false;
         }
         
-        // Validar que la nueva posicion sea valida
         if (!ficha.isEnCasa()) {
             int nuevaPosicion = ficha.getPosicion() + pasos;
             if (nuevaPosicion < 0) {
@@ -312,7 +311,9 @@ public class ControladorPartida {
     }
     
     /**
-     * CORREGIDO: Aplica las reglas del turno después de tirar el dado
+     * ✅ CORREGIDO: Aplica las reglas del turno después de tirar el dado
+     * ELIMINA la regla FALSA del turno extra con 5+ficha
+     * 
      * @param valorDado Valor obtenido en el dado
      * @param huboMovimiento Si se movió alguna ficha o no
      */
@@ -321,23 +322,13 @@ public class ControladorPartida {
         RegistroPartidaJSON registro = partida.getRegistroJSON();
         Jugador jugadorActual = partida.getTurnoActual();
         
-        // Verificar si obtiene turno extra (6 o 5 al sacar ficha)
         boolean turnoExtra = false;
         
-        // NUEVO: Regla del 5 - turno extra al sacar ficha de casa
-        if (valorDado == 5 && ultimaFichaMovida != null && huboMovimiento) {
-            // Verificar si la ficha recién sacó de casa
-            if (ultimaFichaMovida.getPosicion() == obtenerPosicionSalida(jugadorActual.getColor())) {
-                turnoExtra = true;
-                vista.mostrarMensaje("¡Sacaste 5 y una ficha! Tienes un turno extra.");
-            }
-        }
-        
-        // Regla del 6 - siempre turno extra
+        // ========================================
+        // ÚNICA REGLA DE TURNO EXTRA: SACAR 6
+        // ========================================
         if (reglas.verificarTurnoExtra(valorDado)) {
-            turnoExtra = true;
             partida.incrementarContadorSeis();
-            
             int contadorActual = partida.getContadorSeis();
             registro.registrarTurnoExtra(jugadorActual.getNombre());
             
@@ -362,58 +353,73 @@ public class ControladorPartida {
                 // Perder el turno y los premios
                 partida.reiniciarContadorSeis();
                 casillasPremio = 0;
-                turnoExtra = false; // IMPORTANTE: Cancelar el turno extra
+                turnoExtra = false; // Cancelar el turno extra
                 
                 vista.mostrarMensaje("Pierdes el turno por tres 6 consecutivos.");
             } else {
                 vista.mostrarMensaje("¡Sacaste 6! Tira de nuevo (" + contadorActual + "/3)");
+                turnoExtra = true;
             }
         }
         
-        // CORREGIDO: Gestión del cambio de turno
+        // ========================================
+        // GESTIÓN DEL CAMBIO DE TURNO
+        // ========================================
         if (turnoExtra) {
             // Continuar con el mismo jugador
             if (controladorRed == null || esTurnoLocal()) {
                 vista.mostrarMensaje("Presiona ENTER para continuar tu turno");
                 scanner.nextLine();
-                iniciarTurno(); // Continuar sin cambiar turno
+                iniciarTurno();
             }
         } else {
             // Cambiar de turno
-            partida.reiniciarContadorSeis();
-            
-            Jugador jugadorAnterior = partida.getTurnoActual();
-            partida.cambiarTurno();
-            
-            registro.registrarCambioTurno(
-                jugadorAnterior.getNombre(),
-                partida.getTurnoActual().getNombre()
-            );
-            
-            if (controladorRed != null) {
-                controladorRed.notificarCambioTurno(partida.getTurnoActual());
-            }
+            cambiarTurnoDirectamente();
         }
     }
     
     /**
-     * CORREGIDO: Aplica cambio de turno recibido desde la red
+     * ✅ NUEVO: Cambia el turno sin verificar condiciones adicionales
+     * Se usa cuando no hay fichas disponibles o cuando se debe cambiar turno normalmente
+     */
+    private void cambiarTurnoDirectamente() {
+        RegistroPartidaJSON registro = partida.getRegistroJSON();
+        
+        // Reiniciar contador de 6 y premios
+        partida.reiniciarContadorSeis();
+        casillasPremio = 0;
+        
+        Jugador jugadorAnterior = partida.getTurnoActual();
+        partida.cambiarTurno();
+        
+        registro.registrarCambioTurno(
+            jugadorAnterior.getNombre(),
+            partida.getTurnoActual().getNombre()
+        );
+        
+        if (controladorRed != null) {
+            controladorRed.notificarCambioTurno(partida.getTurnoActual());
+        }
+        
+        System.out.println("[TURNO] Cambiado de " + jugadorAnterior.getNombre() + 
+                         " a " + partida.getTurnoActual().getNombre());
+    }
+    
+    /**
+     * Aplica cambio de turno recibido desde la red
      */
     public void aplicarCambioTurnoRemoto(int jugadorId) {
         partida.setTurnoActual(jugadorId);
         
         System.out.println("[RED] Turno cambiado remotamente al jugador " + jugadorId);
         
-        // NUEVO: Si es el turno del jugador local, iniciar automáticamente
         if (jugadorId == jugadorLocalId) {
             System.out.println("\n========================================");
             System.out.println(">>> ¡ES TU TURNO! <<<");
             System.out.println("========================================");
             
-            // Iniciar el turno del jugador local
             if (controladorRed == null || esTurnoLocal()) {
                 vista.mostrarMensaje("Presiona ENTER para tirar el dado");
-                // El scanner.nextLine() se manejará en el ciclo principal del juego
             }
         }
     }
@@ -456,7 +462,7 @@ public class ControladorPartida {
         Dado dado = partida.getDado();
 
         int valorDado = dado.lanzar();
-        ultimoValorDado = valorDado; // NUEVO: Guardar valor
+        ultimoValorDado = valorDado;
         System.out.println("[WEB] " + jugadorActual.getNombre() + " lanzó el dado: " + valorDado);
 
         return valorDado;
@@ -501,7 +507,7 @@ public class ControladorPartida {
         }
 
         moverFicha(fichaSeleccionada, pasos, true);
-        aplicarReglasDelTurno(pasos, true); // NUEVO: Aplicar reglas después del movimiento web
+        aplicarReglasDelTurno(pasos, true);
         return true;
     }
 
