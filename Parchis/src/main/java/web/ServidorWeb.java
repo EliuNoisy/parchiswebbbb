@@ -197,10 +197,31 @@ public class ServidorWeb extends WebSocketServer {
                 broadcast(respuesta);
                 break;
                 
-            case "TIRARDADO":
-                System.out.println("[SERVIDOR] Broadcasting resultado del dado");
-                broadcast(respuesta);
-                break;
+           case "TIRARDADO":
+    System.out.println("[SERVIDOR] Broadcasting resultado del dado");
+    broadcast(respuesta);
+    
+    // NUEVO: Si no hay fichas disponibles, enviar cambio de turno
+    try {
+        JsonObject jsonRespuesta = JsonParser.parseString(respuesta).getAsJsonObject();
+        
+        if (jsonRespuesta.has("sinFichasDisponibles") && 
+            jsonRespuesta.get("sinFichasDisponibles").getAsBoolean()) {
+            
+            String turnoActual = jsonRespuesta.get("turnoActual").getAsString();
+            
+            Map<String, Object> cambioTurnoMsg = new HashMap<>();
+            cambioTurnoMsg.put("tipo", "TURNO_CAMBIADO");
+            cambioTurnoMsg.put("turnoActual", turnoActual);
+            cambioTurnoMsg.put("contadorSeis", 0);
+            
+            System.out.println("[SERVIDOR] Sin fichas disponibles, cambiando turno a: " + turnoActual);
+            broadcast(gson.toJson(cambioTurnoMsg));
+        }
+    } catch (Exception e) {
+        System.err.println("[SERVIDOR] Error: " + e.getMessage());
+    }
+    break;
                 
             case "MOVERFICHA":
                 System.out.println("[SERVIDOR] Broadcasting movimiento de ficha");

@@ -975,18 +975,26 @@ function procesarDado(mensaje) {
         mostrarDado(valor);
     }, 500);
     
-    const jugador = mensaje.jugador || mensaje.color;
-    const nombreJugador = obtenerNombreJugador(jugador);
+    const colorJugador = mensaje.color; // USAR SOLO COLOR, NO NOMBRE
+    const nombreJugador = obtenerNombreJugador(colorJugador);
     agregarLog(`${nombreJugador} tiró un ${valor}`, 'importante');
     
-    // Si es mi turno, verificar fichas disponibles
-    if (jugador === miColor || mensaje.jugador === miNombre) {
-        console.log('[DADO] Es mi turno, verificando fichas...');
+    // NUEVO: Verificar si el backend indica que no hay fichas disponibles
+    if (mensaje.sinFichasDisponibles) {
+        console.log('[DADO] Backend indica: sin fichas disponibles');
+        agregarLog('No hay fichas disponibles para mover');
+        // El backend ya cambió el turno, no hacer nada más
+        return;
+    }
+    
+    // CORREGIDO: Solo verificar fichas si ES MI COLOR
+    if (colorJugador === miColor) {
+        console.log('[DADO] ✓ Es mi turno, verificando mis fichas...');
         setTimeout(() => {
             verificarFichasDisponibles(valor);
         }, 800);
     } else {
-        console.log('[DADO] No es mi turno');
+        console.log('[DADO] ✗ No es mi turno, turno de:', colorJugador);
     }
 }
 // ============================================
@@ -1000,22 +1008,28 @@ function verificarFichasDisponibles(valorDado) {
     Object.values(estadoJuego.fichas).forEach(ficha => {
         if (ficha.color !== miColor || ficha.enMeta) return;
         
-        // Si está en casa, solo puede salir con 5
+        // Si está en casa, SOLO puede salir con 5
         if (ficha.enCasa) {
             if (valorDado === 5) {
                 fichasDisponiblesParaMover.push(ficha.id);
-                console.log('[FICHAS] Ficha puede salir de casa:', ficha.id);
+                console.log('[FICHAS] ✓ Ficha puede salir de casa:', ficha.id);
             }
-        } else if (ficha.enPasillo) {
-            // En pasillo: verificar que no se pase de la meta
+        } 
+        // Si está en el pasillo
+        else if (ficha.enPasillo) {
+            // En pasillo: verificar que no se pase de la meta (posición 6 es la meta)
             if (ficha.posicionPasillo + valorDado <= 6) {
                 fichasDisponiblesParaMover.push(ficha.id);
-                console.log('[FICHAS] Ficha puede avanzar en pasillo:', ficha.id);
+                console.log('[FICHAS] ✓ Ficha puede avanzar en pasillo:', ficha.id);
+            } else {
+                console.log('[FICHAS] ✗ Ficha se pasaría de la meta:', ficha.id);
             }
-        } else {
-            // En tablero: siempre puede moverse
+        } 
+        // Si está en el tablero normal
+        else {
+            // En tablero: siempre puede moverse (el backend verificará si puede entrar al pasillo)
             fichasDisponiblesParaMover.push(ficha.id);
-            console.log('[FICHAS] Ficha puede moverse:', ficha.id);
+            console.log('[FICHAS] ✓ Ficha puede moverse en tablero:', ficha.id);
         }
     });
     
@@ -1023,7 +1037,7 @@ function verificarFichasDisponibles(valorDado) {
     
     if (fichasDisponiblesParaMover.length === 0) {
         agregarLog('No hay fichas disponibles para mover');
-        // El servidor manejará el cambio de turno automáticamente
+        // No hacer nada, esperar a que el backend cambie el turno
     } else {
         mostrarFichasDisponibles();
     }
@@ -1114,11 +1128,8 @@ function procesarMovimiento(mensaje) {
     console.log('[MOVIMIENTO] Procesando:', mensaje);
     
     // Actualizar estado de la ficha
-    let fichaId = mensaje.fichaId;
-    
-    // Si viene fichaEstado, usar esos datos
     if (mensaje.fichaEstado) {
-        fichaId = `${mensaje.fichaEstado.color}_${mensaje.fichaEstado.numero}`;
+        const fichaId = `${mensaje.fichaEstado.color}_${mensaje.fichaEstado.numero}`;
         const ficha = estadoJuego.fichas[fichaId];
         if (ficha) {
             ficha.enCasa = mensaje.fichaEstado.enCasa;
@@ -1126,15 +1137,6 @@ function procesarMovimiento(mensaje) {
             ficha.enMeta = mensaje.fichaEstado.enMeta || false;
             ficha.enPasillo = mensaje.fichaEstado.enPasillo || false;
             ficha.posicionPasillo = mensaje.fichaEstado.posicionPasillo || -1;
-        }
-    } else if (fichaId) {
-        const ficha = estadoJuego.fichas[fichaId];
-        if (ficha) {
-            if (mensaje.enCasa !== undefined) ficha.enCasa = mensaje.enCasa;
-            if (mensaje.posicion !== undefined) ficha.posicion = mensaje.posicion;
-            if (mensaje.enMeta !== undefined) ficha.enMeta = mensaje.enMeta;
-            if (mensaje.enPasillo !== undefined) ficha.enPasillo = mensaje.enPasillo;
-            if (mensaje.posicionPasillo !== undefined) ficha.posicionPasillo = mensaje.posicionPasillo;
         }
     }
     
@@ -1150,15 +1152,12 @@ function procesarMovimiento(mensaje) {
         agregarLog(`¡${jugadorNombre} llevó una ficha a la META!`, 'exito');
     }
     
+    if (mensaje.fichaCumida) {
+        agregarLog(`¡${jugadorNombre} comió una ficha! +20 casillas`, 'exito');
+    }
+    
     dibujarTablero();
     actualizarInfoJugadores();
-    
-    // CORREGIDO: Ya no maneja post-movimiento localmente
-    // El servidor enviará TURNO_EXTRA o TURNO_CAMBIADO
-    const esmiTurno = (mensaje.jugador === miNombre) || (mensaje.color === miColor);
-    if (esmiTurno) {
-        manejarPostMovimiento();
-    }
 }
 
 // ============================================

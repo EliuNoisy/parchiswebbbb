@@ -181,61 +181,79 @@ public class AdaptadorJuego {
         System.out.println("\n========================================");
         System.out.println("[ADAPTADOR] TIRAR DADO - INICIO");
         System.out.println("========================================");
-        
+
         Integer idJugador = jugadorSesion.get(sessionId);
         System.out.println("[ADAPTADOR] SessionId: " + sessionId);
         System.out.println("[ADAPTADOR] IdJugador obtenido: " + idJugador);
-        
+
         if (idJugador == null) {
             System.out.println("[ADAPTADOR] ERROR: Jugador no registrado");
             System.out.println("[ADAPTADOR] Sesiones registradas: " + jugadorSesion.keySet());
             return crearError("Jugador no registrado");
         }
-        
+
         Jugador jugador = buscarJugadorPorId(idJugador);
         System.out.println("[ADAPTADOR] Jugador encontrado: " + (jugador != null ? jugador.getNombre() : "NULL"));
-        
+
         if (jugador == null) {
             System.out.println("[ADAPTADOR] ERROR: Jugador no encontrado en partida");
             return crearError("Jugador no encontrado");
         }
-        
+
         if (partida.getTurnoActual() == null) {
             System.out.println("[ADAPTADOR] ERROR: La partida no ha iniciado");
             return crearError("La partida no ha iniciado");
         }
-        
+
         System.out.println("[ADAPTADOR] Turno actual: " + partida.getTurnoActual().getColor());
         System.out.println("[ADAPTADOR] Color del jugador: " + jugador.getColor());
-        
+
         if (partida.getTurnoActual().getIdJugador() != jugador.getIdJugador()) {
             String mensaje = "No es tu turno. Turno actual: " + partida.getTurnoActual().getColor();
             System.out.println("[ADAPTADOR] ERROR: " + mensaje);
             return crearError(mensaje);
         }
-        
+
         System.out.println("[ADAPTADOR] ✓ Validación pasada, lanzando dado...");
         int valorDado = partida.getDado().lanzar();
         System.out.println("[ADAPTADOR] *** DADO LANZADO: " + valorDado + " ***");
-        
+
         if (valorDado == 6) {
             partida.incrementarContadorSeis();
             System.out.println("[ADAPTADOR] Contador de 6: " + partida.getContadorSeis());
         } else {
             partida.reiniciarContadorSeis();
         }
-        
+
+        // NUEVO: Verificar si hay fichas disponibles
+        List<Ficha> fichasDisponibles = jugador.getFichasDisponibles(valorDado);
+
+        System.out.println("[ADAPTADOR] Fichas disponibles: " + fichasDisponibles.size());
+
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("tipo", "DADO_TIRADO");
         respuesta.put("jugador", jugador.getNombre());
         respuesta.put("color", jugador.getColor());
         respuesta.put("valor", valorDado);
         respuesta.put("contadorSeis", partida.getContadorSeis());
-        
+
+        // NUEVO: Si no hay fichas disponibles, cambiar turno automáticamente
+        if (fichasDisponibles.isEmpty()) {
+            System.out.println("[ADAPTADOR] ⚠️ No hay fichas disponibles, cambiando turno...");
+            partida.reiniciarContadorSeis();
+            Jugador jugadorAnterior = partida.getTurnoActual();
+            partida.cambiarTurno();
+
+            respuesta.put("sinFichasDisponibles", true);
+            respuesta.put("turnoActual", partida.getTurnoActual().getColor());
+
+            System.out.println("[ADAPTADOR] Turno cambiado a: " + partida.getTurnoActual().getColor());
+        }
+
         String jsonRespuesta = gson.toJson(respuesta);
         System.out.println("[ADAPTADOR] Respuesta JSON: " + jsonRespuesta);
         System.out.println("========================================\n");
-        
+
         return jsonRespuesta;
     }
     
@@ -244,145 +262,176 @@ public class AdaptadorJuego {
      * @param fichaNumero Número de ficha (1-4) NO el idFicha global
      */
     public String moverFicha(String sessionId, int fichaNumero, int pasos) {
-        Integer idJugador = jugadorSesion.get(sessionId);
+    Integer idJugador = jugadorSesion.get(sessionId);
+    
+    if (idJugador == null) {
+        return crearError("Jugador no registrado");
+    }
+    
+    Jugador jugador = buscarJugadorPorId(idJugador);
+    
+    if (jugador == null) {
+        return crearError("Jugador no encontrado");
+    }
+    
+    if (partida.getTurnoActual().getIdJugador() != jugador.getIdJugador()) {
+        return crearError("No es tu turno");
+    }
+    
+    Ficha ficha = jugador.seleccionarFicha(fichaNumero - 1);
+    
+    if (ficha == null) {
+        return crearError("Ficha no válida. Número: " + fichaNumero);
+    }
+    
+    System.out.println("[ADAPTADOR] Moviendo ficha " + fichaNumero + " del jugador " + jugador.getColor() + " - " + pasos + " pasos");
+    
+    boolean movimientoValido = false;
+    boolean fichaCumida = false;
+    boolean llegadaMeta = false;
+    boolean salioDeCasa = false;
+    int premioCasillas = 0;
+    
+    // Lógica de movimiento (MANTENER LA MISMA QUE TIENES)
+    if (pasos == 5 && ficha.isEnCasa()) {
+        int casillaInicio = obtenerCasillaInicio(jugador.getColor());
+        ficha.setPosicion(casillaInicio);
+        ficha.setEnCasa(false);
+        partida.getTablero().getCasilla(casillaInicio).agregarFicha(ficha);
+        movimientoValido = true;
+        salioDeCasa = true;
+        System.out.println("[ADAPTADOR] Ficha salió de casa a casilla " + casillaInicio);
         
-        if (idJugador == null) {
-            return crearError("Jugador no registrado");
-        }
+    } else if (!ficha.isEnCasa() && !ficha.isEnMeta()) {
+        int posicionActual = ficha.getPosicion();
+        int nuevaPosicion = calcularNuevaPosicion(jugador.getColor(), posicionActual, pasos);
         
-        Jugador jugador = buscarJugadorPorId(idJugador);
-        
-        if (jugador == null) {
-            return crearError("Jugador no encontrado");
-        }
-        
-        if (partida.getTurnoActual().getIdJugador() != jugador.getIdJugador()) {
-            return crearError("No es tu turno");
-        }
-        
-        // IMPORTANTE: fichaNumero es 1-4, convertir a índice 0-3
-        Ficha ficha = jugador.seleccionarFicha(fichaNumero - 1);
-        
-        if (ficha == null) {
-            return crearError("Ficha no válida. Número: " + fichaNumero);
-        }
-        
-        System.out.println("[ADAPTADOR] Moviendo ficha " + fichaNumero + " del jugador " + jugador.getColor() + " - " + pasos + " pasos");
-        
-        boolean movimientoValido = false;
-        boolean fichaCumida = false;
-        boolean llegadaMeta = false;
-        boolean salioDeCasa = false;
-        int premioCasillas = 0;
-        
-        // Lógica de movimiento
-        if (pasos == 5 && ficha.isEnCasa()) {
-            // Sacar ficha de casa
-            int casillaInicio = obtenerCasillaInicio(jugador.getColor());
-            ficha.setPosicion(casillaInicio);
-            ficha.setEnCasa(false);
-            partida.getTablero().getCasilla(casillaInicio).agregarFicha(ficha);
-            movimientoValido = true;
-            salioDeCasa = true;
+        if (nuevaPosicion >= 0) {
+            if (posicionActual >= 0 && posicionActual < TOTAL_CASILLAS) {
+                partida.getTablero().getCasilla(posicionActual).removerFicha(ficha);
+            }
             
-            System.out.println("[ADAPTADOR] Ficha salió de casa a casilla " + casillaInicio);
-            
-        } else if (!ficha.isEnCasa() && !ficha.isEnMeta()) {
-            // Mover ficha en el tablero
-            int posicionActual = ficha.getPosicion();
-            int nuevaPosicion = calcularNuevaPosicion(jugador.getColor(), posicionActual, pasos);
-            
-            System.out.println("[ADAPTADOR] Posición actual: " + posicionActual + " -> Nueva posición: " + nuevaPosicion);
-            
-            if (nuevaPosicion >= 0) {
-                // Remover de casilla actual si está en el tablero principal
-                if (posicionActual >= 0 && posicionActual < TOTAL_CASILLAS) {
-                    partida.getTablero().getCasilla(posicionActual).removerFicha(ficha);
-                }
+            if (nuevaPosicion >= 100) {
+                int posicionPasillo = nuevaPosicion - 100;
                 
-                // Verificar si entra al pasillo o llega a meta
-                if (nuevaPosicion >= 100) {
-                    // Está en el pasillo de meta (usamos 100+ para indicar pasillo)
-                    int posicionPasillo = nuevaPosicion - 100;
-                    
-                    if (posicionPasillo >= CASILLAS_PASILLO - 1) {
-                        // Llegó a la meta
-                        ficha.llegarMeta();
-                        llegadaMeta = true;
-                        premioCasillas = 10;
-                        System.out.println("[ADAPTADOR] ¡Ficha llegó a META!");
-                    } else {
-                        ficha.setPosicion(nuevaPosicion);
-                    }
+                if (posicionPasillo >= CASILLAS_PASILLO - 1) {
+                    ficha.llegarMeta();
+                    llegadaMeta = true;
+                    premioCasillas = 10;
                 } else {
-                    // Movimiento normal en el tablero
                     ficha.setPosicion(nuevaPosicion);
+                }
+            } else {
+                ficha.setPosicion(nuevaPosicion);
+                
+                if (nuevaPosicion < TOTAL_CASILLAS) {
+                    partida.getTablero().getCasilla(nuevaPosicion).agregarFicha(ficha);
                     
-                    // Agregar a nueva casilla
-                    if (nuevaPosicion < TOTAL_CASILLAS) {
-                        partida.getTablero().getCasilla(nuevaPosicion).agregarFicha(ficha);
+                    if (!partida.getTablero().getCasilla(nuevaPosicion).esSegura()) {
+                        List<Ficha> fichasEnCasilla = new ArrayList<>(
+                            partida.getTablero().getCasilla(nuevaPosicion).getFichas()
+                        );
                         
-                        // Verificar si come fichas
-                        if (!partida.getTablero().getCasilla(nuevaPosicion).esSegura()) {
-                            List<Ficha> fichasEnCasilla = new ArrayList<>(
-                                partida.getTablero().getCasilla(nuevaPosicion).getFichas()
-                            );
-                            
-                            for (Ficha otraFicha : fichasEnCasilla) {
-                                if (!otraFicha.equals(ficha) && !otraFicha.getColor().equals(ficha.getColor())) {
-                                    otraFicha.regresarACasa();
-                                    partida.getTablero().getCasilla(nuevaPosicion).removerFicha(otraFicha);
-                                    fichaCumida = true;
-                                    premioCasillas = 20;
-                                    System.out.println("[ADAPTADOR] ¡Ficha comida! Color: " + otraFicha.getColor());
-                                }
+                        for (Ficha otraFicha : fichasEnCasilla) {
+                            if (!otraFicha.equals(ficha) && !otraFicha.getColor().equals(ficha.getColor())) {
+                                otraFicha.regresarACasa();
+                                partida.getTablero().getCasilla(nuevaPosicion).removerFicha(otraFicha);
+                                fichaCumida = true;
+                                premioCasillas = 20;
                             }
                         }
                     }
                 }
-                
-                movimientoValido = true;
             }
+            
+            movimientoValido = true;
         }
-        
-        if (!movimientoValido) {
-            return crearError("Movimiento no válido para ficha " + fichaNumero);
-        }
-        
-        // Crear respuesta
-        Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("tipo", "FICHA_MOVIDA");
-        respuesta.put("jugador", jugador.getNombre());
-        respuesta.put("color", jugador.getColor());
-        respuesta.put("fichaNumero", fichaNumero);
-        respuesta.put("fichaCumida", fichaCumida);
-        respuesta.put("llegadaMeta", llegadaMeta);
-        respuesta.put("salioDeCasa", salioDeCasa);
-        respuesta.put("premioCasillas", premioCasillas);
-        
-        // Estado de la ficha para el frontend
-        Map<String, Object> fichaEstado = new HashMap<>();
-        fichaEstado.put("color", ficha.getColor());
-        fichaEstado.put("numero", fichaNumero);
-        fichaEstado.put("posicion", ficha.getPosicion());
-        fichaEstado.put("enCasa", ficha.isEnCasa());
-        fichaEstado.put("enMeta", ficha.isEnMeta());
-        
-        // Determinar si está en pasillo
-        boolean enPasillo = ficha.getPosicion() >= 100;
-        fichaEstado.put("enPasillo", enPasillo);
-        fichaEstado.put("posicionPasillo", enPasillo ? ficha.getPosicion() - 100 : -1);
-        
-        respuesta.put("fichaEstado", fichaEstado);
-        
-        // Verificar si hay ganador
-        String resultadoGanador = verificarGanador();
-        if (resultadoGanador != null) {
-            return resultadoGanador;
-        }
-        
-        return gson.toJson(respuesta);
     }
+    
+    if (!movimientoValido) {
+        return crearError("Movimiento no válido para ficha " + fichaNumero);
+    }
+    
+    // === APLICAR REGLAS DEL TURNO ===
+    boolean turnoExtra = false;
+    int contadorSeis = partida.getContadorSeis();
+    
+    if (pasos == 5 && salioDeCasa) {
+        turnoExtra = true;
+    }
+    
+    if (pasos == 6) {
+        partida.incrementarContadorSeis();
+        contadorSeis = partida.getContadorSeis();
+        
+        if (contadorSeis >= 3) {
+            if (!ficha.isEnMeta()) {
+                ficha.regresarACasa();
+                if (ficha.getPosicion() >= 0 && ficha.getPosicion() < TOTAL_CASILLAS) {
+                    partida.getTablero().getCasilla(ficha.getPosicion()).removerFicha(ficha);
+                }
+            }
+            turnoExtra = false;
+            partida.reiniciarContadorSeis();
+            contadorSeis = 0;
+            
+            Jugador jugadorAnterior = partida.getTurnoActual();
+            partida.cambiarTurno();
+            
+            Map<String, Object> respuesta = new HashMap<>();
+            respuesta.put("tipo", "PENALIZACION_TRES_SEIS");
+            respuesta.put("jugador", jugadorAnterior.getNombre());
+            respuesta.put("color", jugadorAnterior.getColor());
+            respuesta.put("fichaId", jugadorAnterior.getColor() + "_" + fichaNumero);
+            respuesta.put("turnoActual", partida.getTurnoActual().getColor());
+            respuesta.put("contadorSeis", 0);
+            
+            return gson.toJson(respuesta);
+        } else {
+            turnoExtra = true;
+        }
+    }
+    
+    if (!turnoExtra) {
+        partida.reiniciarContadorSeis();
+        Jugador jugadorAnterior = partida.getTurnoActual();
+        partida.cambiarTurno();
+    }
+    
+    // Crear respuesta
+    Map<String, Object> respuesta = new HashMap<>();
+    respuesta.put("tipo", "FICHA_MOVIDA");
+    respuesta.put("jugador", jugador.getNombre());
+    respuesta.put("color", jugador.getColor());
+    respuesta.put("fichaNumero", fichaNumero);
+    respuesta.put("fichaCumida", fichaCumida);
+    respuesta.put("llegadaMeta", llegadaMeta);
+    respuesta.put("salioDeCasa", salioDeCasa);
+    respuesta.put("premioCasillas", premioCasillas);
+    respuesta.put("turnoExtra", turnoExtra);
+    respuesta.put("contadorSeis", contadorSeis);
+    respuesta.put("turnoActual", partida.getTurnoActual().getColor());
+    
+    Map<String, Object> fichaEstado = new HashMap<>();
+    fichaEstado.put("color", ficha.getColor());
+    fichaEstado.put("numero", fichaNumero);
+    fichaEstado.put("posicion", ficha.getPosicion());
+    fichaEstado.put("enCasa", ficha.isEnCasa());
+    fichaEstado.put("enMeta", ficha.isEnMeta());
+    
+    boolean enPasillo = ficha.getPosicion() >= 100;
+    fichaEstado.put("enPasillo", enPasillo);
+    fichaEstado.put("posicionPasillo", enPasillo ? ficha.getPosicion() - 100 : -1);
+    
+    respuesta.put("fichaEstado", fichaEstado);
+    
+    String resultadoGanador = verificarGanador();
+    if (resultadoGanador != null) {
+        return resultadoGanador;
+    }
+    
+    return gson.toJson(respuesta);
+}
     
     /**
      * Calcula la nueva posición considerando el circuito y entrada a pasillo
