@@ -1075,18 +1075,21 @@ function verificarFichasDisponibles(valorDado) {
 // NUEVO: Mostrar fichas disponibles
 // ============================================
 function mostrarFichasDisponibles() {
-    if (fichasDisponiblesParaMover.length === 1) {
-        // Solo una ficha, mover automáticamente
-        agregarLog('Moviendo ficha automáticamente...');
-        setTimeout(() => {
-            moverFichaSeleccionada(fichasDisponiblesParaMover[0]);
-        }, 500);
-    } else if (fichasDisponiblesParaMover.length > 1) {
-        // Varias fichas disponibles
-        esperandoSeleccionFicha = true;
-        agregarLog('🎯 Selecciona una ficha para mover', 'turno');
-        dibujarTablero(); // Redibujar para mostrar fichas resaltadas
+    if (fichasDisponiblesParaMover.length === 0) {
+        agregarLog('No hay fichas disponibles para mover');
+        return;
     }
+    
+    // ✅ SIEMPRE permitir selección, sin importar cuántas fichas haya
+    esperandoSeleccionFicha = true;
+    
+    if (fichasDisponiblesParaMover.length === 1) {
+        agregarLog('🎯 Haz click en tu ficha para moverla', 'turno');
+    } else {
+        agregarLog('🎯 Selecciona una ficha para mover', 'turno');
+    }
+    
+    dibujarTablero(); // Redibujar para mostrar fichas resaltadas
 }
 
 // ============================================
