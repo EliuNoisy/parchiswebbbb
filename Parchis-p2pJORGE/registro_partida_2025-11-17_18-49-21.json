@@ -1,0 +1,240 @@
+{
+  "inicioPartida": "2025-11-17T18:49:21.076129200",
+  "finPartida": "2025-11-17T19:02:58.172440",
+  "totalEventos": 32,
+  "eventos": [
+    {
+      "tipo": "INICIO_PARTIDA",
+      "timestamp": "2025-11-17T18:51:20.215888900",
+      "descripcion": "Partida iniciada",
+      "jugador1": "Jorge",
+      "jugador2": "Eliu"
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-17T18:51:39.963938500",
+      "descripcion": "Jorge saco ficha 1 de casa",
+      "jugador": "Jorge",
+      "fichaId": 1
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:51:43.112485200",
+      "descripcion": "Eliu lanzo el dado y obtuvo 1",
+      "jugador": "Eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:51:43.112485200",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:53:58.831479500",
+      "descripcion": "Jorge movio ficha 1 de casilla 5 a 11",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 5,
+      "posicionFinal": 11
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:54:10.080097800",
+      "descripcion": "Jorge movio ficha 1 de casilla 11 a 14",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 11,
+      "posicionFinal": 14
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:54:13.969964500",
+      "descripcion": "Eliu lanzo el dado y obtuvo 6",
+      "jugador": "Eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-17T18:54:13.972777100",
+      "descripcion": "Eliu obtuvo turno extra por sacar 6",
+      "jugador": "Eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:54:19.570415200",
+      "descripcion": "Eliu lanzo el dado y obtuvo 3",
+      "jugador": "Eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:54:19.573417300",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:54:25.847408800",
+      "descripcion": "Jorge movio ficha 1 de casilla 14 a 15",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 14,
+      "posicionFinal": 15
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:54:26.153324300",
+      "descripcion": "Eliu lanzo el dado y obtuvo 6",
+      "jugador": "Eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-17T18:54:26.153324300",
+      "descripcion": "Eliu obtuvo turno extra por sacar 6",
+      "jugador": "Eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:54:33.716515400",
+      "descripcion": "Eliu lanzo el dado y obtuvo 6",
+      "jugador": "Eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-17T18:54:33.718136200",
+      "descripcion": "Eliu obtuvo turno extra por sacar 6",
+      "jugador": "Eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:54:40.193479900",
+      "descripcion": "Eliu lanzo el dado y obtuvo 2",
+      "jugador": "Eliu",
+      "valorDado": 2
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:54:40.195303900",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:54:52.470045400",
+      "descripcion": "Jorge movio ficha 1 de casilla 15 a 17",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 15,
+      "posicionFinal": 17
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:55:00.178493300",
+      "descripcion": "Eliu lanzo el dado y obtuvo 6",
+      "jugador": "Eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-17T18:55:00.180491300",
+      "descripcion": "Eliu obtuvo turno extra por sacar 6",
+      "jugador": "Eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:55:03.515575900",
+      "descripcion": "Eliu lanzo el dado y obtuvo 4",
+      "jugador": "Eliu",
+      "valorDado": 4
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:55:03.517743200",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:55:08.621361",
+      "descripcion": "Jorge movio ficha 1 de casilla 17 a 18",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 17,
+      "posicionFinal": 18
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:55:12.310296700",
+      "descripcion": "Eliu lanzo el dado y obtuvo 6",
+      "jugador": "Eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-17T18:55:12.312173300",
+      "descripcion": "Eliu obtuvo turno extra por sacar 6",
+      "jugador": "Eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:55:15.146189100",
+      "descripcion": "Eliu lanzo el dado y obtuvo 5",
+      "jugador": "Eliu",
+      "valorDado": 5
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-17T18:55:17.372710300",
+      "descripcion": "Eliu saco ficha 5 de casa",
+      "jugador": "Eliu",
+      "fichaId": 5
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:55:17.405830800",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:55:23.910760700",
+      "descripcion": "Jorge movio ficha 1 de casilla 18 a 23",
+      "jugador": "Jorge",
+      "fichaId": 1,
+      "posicionInicial": 18,
+      "posicionFinal": 23
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-17T18:55:28.866149",
+      "descripcion": "Eliu lanzo el dado y obtuvo 3",
+      "jugador": "Eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-17T18:55:33.288941400",
+      "descripcion": "Eliu movio ficha 5 de casilla 22 a 25",
+      "jugador": "Eliu",
+      "fichaId": 5,
+      "posicionInicial": 22,
+      "posicionFinal": 25
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-17T18:55:33.290848100",
+      "descripcion": "Turno cambio de Eliu a Jorge",
+      "jugador": "Jorge",
+      "jugadorAnterior": "Eliu"
+    }
+  ]
+}

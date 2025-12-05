@@ -1,0 +1,85 @@
+{
+  "inicioPartida": "2025-11-09T14:41:22.475502800",
+  "finPartida": "2025-11-09T14:42:49.814704700",
+  "totalEventos": 11,
+  "eventos": [
+    {
+      "tipo": "INICIO_PARTIDA",
+      "timestamp": "2025-11-09T14:42:12.831879700",
+      "descripcion": "Partida iniciada",
+      "jugador1": "eliu",
+      "jugador2": "alexa"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-09T14:42:17.448582400",
+      "descripcion": "eliu lanzo el dado y obtuvo 6",
+      "jugador": "eliu",
+      "valorDado": 6
+    },
+    {
+      "tipo": "TURNO_EXTRA",
+      "timestamp": "2025-11-09T14:42:17.448582400",
+      "descripcion": "eliu obtuvo turno extra por sacar 6",
+      "jugador": "eliu"
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-09T14:42:20.301794800",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-09T14:42:20.310818700",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "SALIDA_CASA",
+      "timestamp": "2025-11-09T14:42:26.432340",
+      "descripcion": "alexa saco ficha 5 de casa",
+      "jugador": "alexa",
+      "fichaId": 5
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-09T14:42:26.874317800",
+      "descripcion": "eliu lanzo el dado y obtuvo 3",
+      "jugador": "eliu",
+      "valorDado": 3
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-09T14:42:26.876318700",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    },
+    {
+      "tipo": "MOVIMIENTO",
+      "timestamp": "2025-11-09T14:42:32.199491200",
+      "descripcion": "alexa movio ficha 5 de casilla 22 a 23",
+      "jugador": "alexa",
+      "fichaId": 5,
+      "posicionInicial": 22,
+      "posicionFinal": 23
+    },
+    {
+      "tipo": "TIRADA_DADO",
+      "timestamp": "2025-11-09T14:42:40.702863900",
+      "descripcion": "eliu lanzo el dado y obtuvo 1",
+      "jugador": "eliu",
+      "valorDado": 1
+    },
+    {
+      "tipo": "CAMBIO_TURNO",
+      "timestamp": "2025-11-09T14:42:40.703758300",
+      "descripcion": "Turno cambio de eliu a alexa",
+      "jugador": "alexa",
+      "jugadorAnterior": "eliu"
+    }
+  ]
+}
